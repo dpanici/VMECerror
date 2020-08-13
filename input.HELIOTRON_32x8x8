@@ -1,0 +1,33 @@
+&INDATA
+! Heliotron from Hirshman and Whitson 1983 beta = 0.02
+MGRID_FILE =	'none'
+LFREEB =	F
+DELT =		9.0E-01
+TCON0 = 	2.0E+00
+LASYM = 	F
+NFP = 		19
+NCURR = 	0
+MPOL = 		8
+NTOR = 		8
+NZETA = 	200
+NS_ARRAY = 	32	
+NITER_ARRAY = 	80000
+FTOL_ARRAY = 	1E-16
+NSTEP = 	250
+NVACSKIP = 	6
+GAMMA = 	0.0E+00
+PHIEDGE = 	1.0E+00
+BLOAT = 	1.0E+00
+CURTOR = 	0.0E+00
+SPRES_PED = 	1.0E+00
+PRES_SCALE =	3.43E+03
+PMASS_TYPE = 	"power_series"
+AM = 		1.0 -2.0 1.0
+AI = 		0.5 0.5
+RAXIS = 	10.0
+ZAXIS = 	0.0
+RBC(0,0) = 	10.0  ZBS(0,0) =  0.0
+RBC(0,1) = 	-1.0  ZBS(0,1) =  1.0
+RBC(1,1) = 	-0.3  ZBS(1,1) = -0.3
+/
+&END
