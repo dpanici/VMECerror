@@ -1,5 +1,5 @@
 % test eval_series
-
+close all, clear all
 data = read_vmec('wout_HELIOTRON_16x4x4.nc');
 
 dimS = data.ns;
@@ -11,9 +11,10 @@ u = linspace(0,2*pi,dimU);
 v = linspace(0,2*pi,dimV);
 
 suvgrid = ndgrid(s,u,v);
-
-R = eval_series(suvgrid,data.rmnc,data,'c');
-Z = eval_series(suvgrid,data.zmns,data,'s');
+tic
+R = eval_series2(suvgrid,data.rmnc,data,'c');
+Z = eval_series2(suvgrid,data.zmns,data,'s');
+toc
 
 figure()
 for i=1:dimS

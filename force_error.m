@@ -1,4 +1,5 @@
 % Calculate Force error
+clear all, clearvars
 file = 'wout_HELIOTRON_16x4x4.nc';
 % file = 'wout_HELIOTRON_32x8x8.nc';
 data = read_vmec(file);
