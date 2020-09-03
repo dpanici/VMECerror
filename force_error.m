@@ -1,7 +1,9 @@
 % Calculate Force error
-clear all, clearvars
-file = 'wout_HELIOTRON_16x4x4.nc';
+clear all, clearvars, close all
 % file = 'wout_HELIOTRON_32x8x8.nc';
+% file = 'wout_HELIOTRON_16x4x4.nc';
+file = 'wout_HELIOTRON.nc';
+
 data = read_vmec(file);
 
 %% constants
@@ -17,6 +19,9 @@ v = linspace(0,2*pi,dimV);
 
 suvgrid = ndgrid(s,u,v);
 
+volS = 150;
+s_vol = linspace(0,1,volS);
+volgrid = ndgrid(s_vol,u,v);
 
 %% Flux, iota,and pressure derivs
 iota = data.iotaf;% rotational transform
@@ -25,7 +30,7 @@ iotar = repmat((s_deriv(iota,data))',1,dimU,dimV); % radial deriv or rotational 
 Phi = data.phi; % toroidal flux
 Phir = s_deriv(Phi,data);
 chi = data.chi; % poloidal flux
-chir = repmat((iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
+chir = repmat((-iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
 Phir = repmat(Phir',1,dimU,dimV); % radial deriv of toroidal flux (constant =1 for Heliotron case)
 chirr = iotar .* Phir;
 
@@ -34,6 +39,7 @@ presr = repmat(presr',1,dimU,dimV);
 %% Flux surface locations
 R = eval_series(suvgrid,data.rmnc,data,'c');
 Z = eval_series(suvgrid,data.zmns,data,'s');
+L = eval_series(suvgrid,data.lmns,data,'s');
 
 % get the fourier coefficients for the derivatives of R,Z, and lambda
 RZ_derivs
@@ -73,9 +79,35 @@ L_sv = eval_series(suvgrid, lsvmnc, data, 'c');
 R_ss = eval_series(suvgrid, rssmnc, data, 'c');
 Z_ss = eval_series(suvgrid, zssmns, data, 's');
 
+% below derivs only used at magnetic axis
+R_sss = eval_series(suvgrid, rsssmnc, data, 'c');
+Z_sss = eval_series(suvgrid, zsssmns, data, 's');
+
+
+R_suu = eval_series(suvgrid, rsuumnc, data, 'c');
+Z_suu = eval_series(suvgrid, zsuumns, data, 's');
+R_suv = eval_series(suvgrid, rsuvmnc, data, 'c');
+Z_suv = eval_series(suvgrid, zsuvmns, data, 's');
+R_ssu = eval_series(suvgrid, rssumns, data, 's');
+Z_ssu = eval_series(suvgrid, zssumnc, data, 'c');
+R_ssv = eval_series(suvgrid, rssvmns, data, 's');
+Z_ssv = eval_series(suvgrid, zssvmnc, data, 'c');
+R_svv = eval_series(suvgrid, rsvvmnc, data, 'c');
+Z_svv = eval_series(suvgrid, zsvvmns, data, 's');
+
+L_ssv = eval_series(suvgrid, lssvmnc, data, 'c');
+L_svv = eval_series(suvgrid, lsvvmns, data, 's');
+
+R_sssu = eval_series(suvgrid, rsssumns, data, 's');
+Z_sssu = eval_series(suvgrid, zsssumnc, data, 'c');
+R_ssuu = eval_series(suvgrid, rssuumnc, data, 'c');
+Z_ssuu = eval_series(suvgrid, zssuumns, data, 's');
+R_ssuv = eval_series(suvgrid, rssuvmnc, data, 'c');
+Z_ssuv = eval_series(suvgrid, zssuvmns, data, 's');
+
 
 %% covariant basis vector
-es = cat(4,R_s,zeros(size(R_s)),R_v);
+es = cat(4,R_s,zeros(size(R_s)),Z_s);
 eu = cat(4,R_u, zeros(size(R_s)), Z_u);
 ev = cat(4,R_v, R, Z_v);
 
@@ -90,30 +122,68 @@ euv = cat(4,R_uv, zeros(size(R_s)), Z_uv);
 evs = cat(4,R_sv, R_s, Z_sv);
 evu = cat(4,R_uv, R_u, Z_uv);
 evv = cat(4,R_vv, R_v, Z_vv);
+% Derivs only used at magnetic axis
+esss = cat(4,R_sss, zeros(size(R_s)), Z_sss);
+euss = cat(4,R_ssu, zeros(size(R_s)), Z_ssu);
+eusu = cat(4,R_suu, zeros(size(R_s)), Z_suu);
+evvs = cat(4,R_svv, R_sv, Z_svv);
+evsv=evvs;
+
+essu = euss;
+evss = cat(4,R_ssv, R_ss, Z_ssv);
+essv = cat(4,R_ssv, zeros(size(R_s)), Z_ssv);
+evsu = cat(4,R_suv, R_su, Z_suv);
+esuv = cat(4,R_suv, zeros(size(R_s)), Z_suv);
+eusv = esuv;
+
+eusss = cat(4,R_sssu, zeros(size(R_s)), Z_sssu);
+eussu = cat(4,R_ssuu, zeros(size(R_s)), Z_ssuu);
+eussv = cat(4,R_ssuv, zeros(size(R_s)), Z_ssuv);
 
 %% Jacobian (sqrt(g)) and its derivatives 
-g = dot(es,cross(eu,ev,4),4);
+g = dot(es,cross(eu,ev,4),4); % g is negative... but matches matlabVMEC
 gs = dot(ess,cross(eu,ev,4),4) + dot(es,cross(eus,ev,4),4) + dot(es,cross(eu,evs,4),4);
 gu = dot(esu,cross(eu,ev,4),4) + dot(es,cross(euu,ev,4),4) + dot(es,cross(eu,evu,4),4);
 gv = dot(esv,cross(eu,ev,4),4) + dot(es,cross(euv,ev,4),4) + dot(es,cross(eu,evv,4),4);
 
-%% contravariant basis vectors
+% derivs only used at the axis
+g_ss = dot(ess,cross(eus,ev,4),4) + dot(ess,cross(eus,ev,4),4) + dot(es,cross(euss,ev,4),4) + dot(es,cross(eus,evs,4),4) ...
+     + dot(es,cross(eus,evs,4),4);
+g_su = dot(esu,cross(eus,ev,4),4) + dot(es,cross(eusu,ev,4),4);
+g_sv = dot(esv,cross(eus,ev,4),4) + dot(es,cross(eusv,ev,4),4) + dot(es,cross(eus,evv,4),4);
+
+g_sss = dot(esss,3*cross(eus,ev,4),4) + dot(ess,3*cross(euss,ev,4) + 6*cross(eus,evs,4),4)...
+     + dot(es,cross(eusss,ev,4) + 3*cross(euss,evs,4) + cross(euss,evss,4) + 2*cross(eus,evss,4),4);
+g_ssu = dot(essv,2*cross(eus,ev,4),4) + dot(ess,2*cross(eusv,ev,4) + 2*cross(eus,evv,4),4)...
+     + dot(esv,cross(euss,ev,4) + 2*cross(eus,evs,4),4)...
+     + dot(es,cross(eussv,ev,4) + cross(euss,evv,4) + 2*cross(eusv,evs,4) + 2*cross(eus,evsu,4),4);
+g_ssv = dot(essv,2*cross(eus,ev,4),4) + dot(ess,2*cross(eusv,ev,4)+2*cross(eus,evv,4),4)...
+    + dot(esv,cross(euss,ev,4)+2*cross(eus,evs,4),4) ...
+    + dot(es,cross(eussv,ev,4)+cross(euss,evv,4) + 2*cross(eusv,evs,4) + 2*cross(eus,evsv,4),4);
+ %% contravariant basis vectors
 eS = cross(eu,ev,4)./g;
 eU = cross(ev,es,4)./g;
 eV = cross(es,eu,4)./g;
 
 %% metric tensor components
 gss = dot(eS,eS,4);
+% define gss at magnetic axis
+temp1= cross(eus,ev,4)./gs;
+temp2 = dot(temp1,temp1,4);
+gss(1,:,:)=temp2(1,:,:);
+
 gvv = dot(eV,eV,4);
 guu = dot(eU,eU,4);
 guv = dot(eU,eV,4);
 
 %% contravariant B components
 BU = (chir - Phir.*L_v)./g;
+% define at magnetic axis
 BU(1,:,:) = (chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) ./ gs(1,:,:);
 
 BV = Phir .* (1 - L_u)./g;
-BV(1,:,:) = (Phir(1,:,:).* -L_su(1,:,:)) ./ gs(1,:,:);
+%define at magnetic axis 
+BV(1,:,:) = (Phir(1,:,:).* -L_su(1,:,:)) ./ gs(1,:,:); % L_su is NOT zero, we can define it (L_u is maybe zero tho)
 
 %% partial derivatives of contravariant B components
 BU_s = - gs./g .* (chir - Phir.*L_v) + (chirr - Phir .* L_sv)./g;
@@ -124,6 +194,17 @@ BV_s = (-gs./g .* Phir).*(1 - L_u) + Phir./g .* (-L_su);
 BV_u = - gu./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uu);
 BV_v = - gv./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uv);
 
+%% Define above at the magnetic axis
+BU_s(1,:,:) = (-g_sss(1,:,:) .*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - g_ss(1,:,:).*(chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) + gs(1,:,:).*(-Phir(1,:,:).*L_ssv(1,:,:)))...
+ ./ 2 ./ (gs(1,:,:).^2);
+BU_u(1,:,:) = (-g_ssu(1,:,:).*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - 2.*g_su(1,:,:).*(chirr(1,:,:)-Phir(1,:,:).*L_sv(1,:,:)) + gu(1,:,:).*Phir(1,:,:).*L_ssv(1,:,:) )...
+ ./ 2 ./ (gs(1,:,:).^2);
+BU_v(1,:,:) = (-g_ssv(1,:,:).*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - 2.*g_sv(1,:,:).*(chirr(1,:,:)-Phir(1,:,:).*L_sv(1,:,:)) + gv(1,:,:).*Phir(1,:,:).*L_ssv(1,:,:) - g_ss(1,:,:).*Phir(1,:,:).*L_vv(1,:,:) - 2.*gs(1,:,:).*Phir(1,:,:).*L_svv(1,:,:) )...
+ ./ 2 ./ (gs(1,:,:).^2);
+
+BV_s(1,:,:) = ( -g_sss(1,:,:).*Phir(1,:,:)) ./ 2 ./ (gs(1,:,:).^2);
+BV_u(1,:,:) = (-g_ssu(1,:,:).*Phir(1,:,:)) ./ 2 ./ (gs(1,:,:).^2);
+BV_v(1,:,:) = ( -g_ssv(1,:,:).*Phir(1,:,:) ) ./ 2 ./ (gs(1,:,:).^2);
 %% covariant B derivatives
 Bu_s = dot( BU_s.*eu + BU.*eus+ BV_s.*ev + BV .*evs,eu,4) + dot(BU.*eu + BV.*ev,eus,4);
 Bv_s = dot( BU_s.*eu + BU.*eus+ BV_s.*ev + BV .*evs,ev,4) + dot(BU.*eu + BV.*ev,evs,4);
@@ -137,16 +218,115 @@ Bu_v = dot( BU_v.*eu + BU.*euv+ BV_v.*ev + BV .*evv,eu,4) + dot(BU.*eu + BV.*ev,
 %% Contravariant current (J) components
 JS = (Bv_u - Bu_v) ./ mu0 ./ g;
 JU = (Bs_v - Bv_s) ./ mu0 ./ g;
+JU(1,:,:) = (Bs_v(1,:,:) - Bv_s(1,:,:)) ./ mu0; %at axis g is zero, cancel it out with the g in the Fs eqn
 JV = (Bu_s - Bs_u) ./ mu0 ./ g;
+JV(1,:,:) = (Bu_s(1,:,:) - Bs_u(1,:,:)) ./ mu0;
+
 
 %% Magnitudes of direction vectors
 mag_eS = sqrt(gss);
 mag_beta = g .* sqrt((BV.^2).*guu + (BU.^2).*gvv - 2.*BV.*BU.*guv);
-
+new_mag_beta = sqrt((BV.^2).*dot(cross(ev,es,4),cross(ev,es,4),4) + (BU.^2).*dot(cross(es,eu,4),cross(es,eu,4),4) - 2.*BV.*BU.*dot(cross(ev,es,4),cross(es,eu,4),4));
+min(ismembertol(abs(mag_beta(2:end,:,:)),new_mag_beta(2:end,:,:),1e-2),[],'all'); % can write beta without the magnitude of the Jacobian, tho it is
+%zero at the magnetic axis. 
+%mag_beta(1,:,:) = BV(1,:,:);
 %% Magnitude of Force error (N/m3)
 F_s = g .* (JV.*BU - JU.* BV) + presr;
+F_s(1,:,:) = (JV(1,:,:).*BU(1,:,:) - JU(1,:,:).*BV(1,:,:)) + presr(1,:,:);% define at axis by cancelling the g's
 F_beta = JS;
-F = sqrt((F_s.^2).*gss + (F_beta.^2).*(mag_beta.^2));
+beta_comp = F_beta .* mag_beta;
+% beta_comp(1,:,:) = 
+
+F = sqrt((F_s.^2).*gss) + (F_beta.^2).*(mag_beta.^2);
 
 %% Plot
 plot_force_error
+% [s1,u1,v1] = ndgrid(s,u,v);
+% [s_vol,u,v] = ndgrid(s_vol,u,v); % don't do this, interp the derivs and R,Z instead
+% Rint = griddedInterpolant(s1,u1,v1,R,'linear');
+% Zint = griddedInterpolant(s1,u1,v1,Z,'linear');
+% Fint = griddedInterpolant(s1,u1,v1,F,'linear');
+% 
+% R = Rint(s_vol,u,v);
+% Z = Zint(s_vol,u,v);
+% F = Fint(s_vol,u,v);
+% 
+% plot_force_error
+
+%% Plot mag B
+
+cMap = jet(256);
+dataMax=192;
+dataMin=1;
+centerPoint = 70;
+scalingIntensity=4;
+x = 1:length(cMap);
+x = x - (centerPoint-dataMin)*length(x)/(dataMax-dataMin);
+x = scalingIntensity * x/max(abs(x));
+x = sign(x).* exp(abs(x));
+x = x - min(x); x = x*511/max(x)+1;
+newMap = interp1(x, cMap, 1:512);
+
+nfp_index=0;
+magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4));
+figure()
+contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),magB(:,:,nfp_v_index))
+colormap jet
+caxis([0 0.5])
+xlabel('R (m)')
+ylabel('Z (m)')
+axis equal
+title(sprintf('||B|| I calculate at nfp*phi=%f',v(nfp_v_index)))
+
+BU_vmec = eval_series_nyq(suvgrid,data.bsupumnc,data,'c');
+figure()
+contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BU_vmec(:,:,nfp_v_index))))
+colorbar;
+colormap jet
+caxis([-2 0])
+xlabel('R (m)')
+ylabel('Z (m)')
+axis equal
+title(sprintf('B^u from matlabVMEC at nfp*phi=%f',v(nfp_v_index)))
+
+figure()
+contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BU(:,:,nfp_v_index))))
+colorbar; 
+colormap jet
+caxis([-2 0])
+xlabel('R (m)')
+ylabel('Z (m)')
+axis equal
+title(sprintf('B^u I calculate at nfp*phi=%f',v(nfp_v_index)))
+
+% BV_vmec = eval_series_nyq(suvgrid,data.bsupvmnc,data,'c');
+% figure()
+% contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BV_vmec(:,:,nfp_v_index))))
+% c=colorbar; 
+% caxis([-1 2])
+% xlabel('R (m)')
+% ylabel('Z (m)')
+% axis equal
+% title(sprintf('B^v from matlabVMEC at nfp*phi=%f',v(nfp_v_index)))
+
+% figure()
+% contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BV(:,:,nfp_v_index))))
+% c=colorbar; 
+% caxis([-1,2])
+% xlabel('R (m)')
+% ylabel('Z (m)')
+% axis equal
+% title(sprintf('B^v I calculate at nfp*phi=%f',v(nfp_v_index)))
+% 
+% 
+% magB_vmec = sqrt((BU_vmec.^2).*dot(eu,eu,4) + (BV_vmec.^2).*dot(ev,ev,4));
+% figure()
+% contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(magB_vmec(:,:,nfp_v_index)))
+% c=colorbar; 
+% colormap jet
+% caxis([-1 2])
+% xlabel('R (m)')
+% ylabel('Z (m)')
+% axis equal
+% title(sprintf('||B|| from matlabvmec at nfp*phi=%f',v(nfp_v_index)))
+
