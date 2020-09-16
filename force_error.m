@@ -1,8 +1,9 @@
 % Calculate Force error
-clear all, clearvars, close all
+clearvars, close all
 % file = 'wout_HELIOTRON_32x8x8.nc';
 % file = 'wout_HELIOTRON_16x4x4.nc';
 file = 'wout_HELIOTRON.nc';
+% file = 'wout_DSHAPE.nc';
 
 data = read_vmec(file);
 
@@ -11,7 +12,7 @@ mu0 = 4*pi * 1e-7;
 
 dimS = data.ns;
 dimU = 50;
-dimV = 10;
+dimV = 380;
 %% Define the (s,u,v) 3D grid on which we are evaluating the force error
 s = linspace(0,1,dimS);
 u = linspace(0,2*pi,dimU);
@@ -27,12 +28,15 @@ volgrid = ndgrid(s_vol,u,v);
 iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv(iota,data))',1,dimU,dimV); % radial deriv or rotational transform
 
+
 Phi = data.phi; % toroidal flux
 Phir = s_deriv(Phi,data);
 chi = data.chi; % poloidal flux
 chir = repmat((-iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
 Phir = repmat(Phir',1,dimU,dimV); % radial deriv of toroidal flux (constant =1 for Heliotron case)
 chirr = iotar .* Phir;
+
+iota = repmat(iota',1,dimU,dimV);
 
 presr = s_deriv(data.presf,data);
 presr = repmat(presr',1,dimU,dimV);
@@ -105,6 +109,7 @@ Z_ssuu = eval_series(suvgrid, zssuumns, data, 's');
 R_ssuv = eval_series(suvgrid, rssuvmnc, data, 'c');
 Z_ssuv = eval_series(suvgrid, zssuvmns, data, 's');
 
+plot_derivs
 
 %% covariant basis vector
 es = cat(4,R_s,zeros(size(R_s)),Z_s);
@@ -141,7 +146,7 @@ eussu = cat(4,R_ssuu, zeros(size(R_s)), Z_ssuu);
 eussv = cat(4,R_ssuv, zeros(size(R_s)), Z_ssuv);
 
 %% Jacobian (sqrt(g)) and its derivatives 
-g = dot(es,cross(eu,ev,4),4); % g is negative... but matches matlabVMEC
+g = dot(es,cross(eu,ev,4),4); % g is negative... but matches matlabVMEC, this is b/c HELIOTRON input has a left-handed poloidal convention
 gs = dot(ess,cross(eu,ev,4),4) + dot(es,cross(eus,ev,4),4) + dot(es,cross(eu,evs,4),4);
 gu = dot(esu,cross(eu,ev,4),4) + dot(es,cross(euu,ev,4),4) + dot(es,cross(eu,evu,4),4);
 gv = dot(esv,cross(eu,ev,4),4) + dot(es,cross(euv,ev,4),4) + dot(es,cross(eu,evv,4),4);
@@ -178,8 +183,10 @@ guv = dot(eU,eV,4);
 
 %% contravariant B components
 BU = (chir - Phir.*L_v)./g;
+% BU = Phir .*( -iota - L_v)./g;
 % define at magnetic axis
 BU(1,:,:) = (chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) ./ gs(1,:,:);
+
 
 BV = Phir .* (1 - L_u)./g;
 %define at magnetic axis 
@@ -253,80 +260,4 @@ plot_force_error
 % 
 % plot_force_error
 
-%% Plot mag B
-
-cMap = jet(256);
-dataMax=192;
-dataMin=1;
-centerPoint = 70;
-scalingIntensity=4;
-x = 1:length(cMap);
-x = x - (centerPoint-dataMin)*length(x)/(dataMax-dataMin);
-x = scalingIntensity * x/max(abs(x));
-x = sign(x).* exp(abs(x));
-x = x - min(x); x = x*511/max(x)+1;
-newMap = interp1(x, cMap, 1:512);
-
-nfp_index=0;
-magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4));
-figure()
-contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),magB(:,:,nfp_v_index))
-colormap jet
-caxis([0 0.5])
-xlabel('R (m)')
-ylabel('Z (m)')
-axis equal
-title(sprintf('||B|| I calculate at nfp*phi=%f',v(nfp_v_index)))
-
-BU_vmec = eval_series_nyq(suvgrid,data.bsupumnc,data,'c');
-figure()
-contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BU_vmec(:,:,nfp_v_index))))
-colorbar;
-colormap jet
-caxis([-2 0])
-xlabel('R (m)')
-ylabel('Z (m)')
-axis equal
-title(sprintf('B^u from matlabVMEC at nfp*phi=%f',v(nfp_v_index)))
-
-figure()
-contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BU(:,:,nfp_v_index))))
-colorbar; 
-colormap jet
-caxis([-2 0])
-xlabel('R (m)')
-ylabel('Z (m)')
-axis equal
-title(sprintf('B^u I calculate at nfp*phi=%f',v(nfp_v_index)))
-
-% BV_vmec = eval_series_nyq(suvgrid,data.bsupvmnc,data,'c');
-% figure()
-% contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BV_vmec(:,:,nfp_v_index))))
-% c=colorbar; 
-% caxis([-1 2])
-% xlabel('R (m)')
-% ylabel('Z (m)')
-% axis equal
-% title(sprintf('B^v from matlabVMEC at nfp*phi=%f',v(nfp_v_index)))
-
-% figure()
-% contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(abs(BV(:,:,nfp_v_index))))
-% c=colorbar; 
-% caxis([-1,2])
-% xlabel('R (m)')
-% ylabel('Z (m)')
-% axis equal
-% title(sprintf('B^v I calculate at nfp*phi=%f',v(nfp_v_index)))
-% 
-% 
-% magB_vmec = sqrt((BU_vmec.^2).*dot(eu,eu,4) + (BV_vmec.^2).*dot(ev,ev,4));
-% figure()
-% contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(magB_vmec(:,:,nfp_v_index)))
-% c=colorbar; 
-% colormap jet
-% caxis([-1 2])
-% xlabel('R (m)')
-% ylabel('Z (m)')
-% axis equal
-% title(sprintf('||B|| from matlabvmec at nfp*phi=%f',v(nfp_v_index)))
 

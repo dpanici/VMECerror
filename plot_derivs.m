@@ -5,13 +5,28 @@ close all
 % Check derivative values by plotting derivs and original quantities
 % together
 
+% check iota, iotar and chi, chir - Good
+% figure()
+% plot(data.phi,iota)
+% hold on
+% plot(data.phi,s_deriv(iota,data))
+% legend('iota','iota_s')
+% 
+% figure()
+% plot(data.phi,chi)
+% hold on
+% plot(data.phi,s_deriv(chi,data))
+% hold on
+% plot(data.phi,-iota.*s_deriv(Phi,data))
+% legend('chi','chi_s','-iota.*Phir')
+
 %% Angular Derivs - All good after realizing sign error in v derivs
 % derivplot(R,R_u,u) % good
 % derivplot(Z,Z_u,u) % good
 % derivplot(R,R_v,v) % good
 % derivplot(Z,Z_v,v) % good
 derivplot(L,L_u,u) % good % Matches VMECplot
-derivplot(L,L_v,v) % good % does NOT match VMECplot
+derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 %  
 % derivplot(R_u,R_uu,u) % good
 % derivplot(Z_u,Z_uu,u) % good
@@ -61,7 +76,7 @@ function foo = derivplot(value,deriv,var_wrt_to)
 valname = inputname(1);
 derivname = inputname(2);
 wrtname = inputname(3);
-sindex=50;
+sindex=5;
 uindex=5;
 vindex=5;
 figure()

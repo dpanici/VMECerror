@@ -53,7 +53,7 @@ assert(isequal(rumns, d.rumns)) % check against VMEC output  which also calculat
 % R_v =  rmnc * n*nfp*sin(m*u - n*v*nfp)
 rvmns = d.rmnc .* xn';%.* d.nfp;
 
-assert(isequal(-rvmns, d.rvmns)) % must asset the - of ours is equal bc matlabvmec uses (mu-nvnfp)
+assert(isequal(-rvmns, d.rvmns)) % must assert the - of ours is equal bc matlabvmec uses (mu-nvnfp)
 
 % R_uu = -rmnc * m^2 * cos(m*u - n*v*nfp)
 ruumnc = -d.rmnc .* (xm.^2)';

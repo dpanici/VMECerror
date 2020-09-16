@@ -1,0 +1,5 @@
+*.asv
+*.eps
+*.fig
+test.m
+defunct/*
