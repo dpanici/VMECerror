@@ -29,9 +29,10 @@ iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv(iota,data))',1,dimU,dimV); % radial deriv or rotational transform
 
 
-Phi = data.phi; % toroidal flux
+Phi = data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
+% chi, Phi are actually the normalized fluxes
 Phir = s_deriv(Phi,data);
-chi = data.chi; % poloidal flux
+chi = data.chi./2./pi; % poloidal flux
 chir = repmat((-iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
 Phir = repmat(Phir',1,dimU,dimV); % radial deriv of toroidal flux (constant =1 for Heliotron case)
 chirr = iotar .* Phir;
@@ -65,6 +66,17 @@ Z_uv = eval_series(suvgrid, zuvmns, data, 's');
 
 L_u = eval_series(suvgrid, lumnc, data, 'c');
 L_v = eval_series(suvgrid, lvmnc, data, 'c');
+
+% VMEC2000
+% https://github.com/PrincetonUniversity/STELLOPT/blob/4b84cce109ba2e8e9cadbca0c7c8c2117dce13ba/VMEC2000/Sources/General/bcovar.f
+% Line 170 lambda derivs are scaled by LAMSCALE
+% https://github.com/PrincetonUniversity/STELLOPT/blob/4b84cce109ba2e8e9cadbca0c7c8c2117dce13ba/VMEC2000/Sources/Initialization_Cleanup/profil1d.f
+% LAMSCALE is defined at line 103 of above
+% phipstotal = sum(Phi(2:end).^(2));
+% hs = Phi(3)-Phi(2);
+% lamscale = sqrt(hs*phipstotal);
+% L_u = L_u .* lamscale;
+% L_v = L_v .* lamscale;
 
 L_uu = eval_series(suvgrid, luumns, data, 's');
 L_vv = eval_series(suvgrid, lvvmns, data, 's');
@@ -183,12 +195,12 @@ guv = dot(eU,eV,4);
 
 %% contravariant B components
 BU = (chir - Phir.*L_v)./g;
-% BU = Phir .*( -iota - L_v)./g;
 % define at magnetic axis
 BU(1,:,:) = (chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) ./ gs(1,:,:);
 
+% 
 
-BV = Phir .* (1 - L_u)./g;
+BV = Phir .* (1 + L_u)./g;
 %define at magnetic axis 
 BV(1,:,:) = (Phir(1,:,:).* -L_su(1,:,:)) ./ gs(1,:,:); % L_su is NOT zero, we can define it (L_u is maybe zero tho)
 

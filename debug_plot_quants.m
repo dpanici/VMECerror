@@ -6,7 +6,7 @@ close all
 
 
 % nfp_index=0;
-u_index=1; % index of u to plot quantities at
+u_index= 1; % index of u to plot quantities at
 v_nfp_index=1; % index of v to plot quantities at
 
 BU_vmec = eval_series_nyq(suvgrid,data.bsupumnc,data,'c');
@@ -25,17 +25,19 @@ magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4));
 
 
 figure()
+subplot(1,2,1)
 plot(data.phi,magB(:,u_index,v_nfp_index))
 title(sprintf('||B|| vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 xlabel('s')
 ylabel('||B||')
+ylim([0,max(magB(:,u_index,v_nfp_index))])
 
-figure()
+subplot(1,2,2)
 plot(data.phi,magB_vmec(:,u_index,v_nfp_index))
 title(sprintf('||B|| vmec vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 xlabel('s')
 ylabel('||B||')
-
+ylim([0,max(magB(:,u_index,v_nfp_index))])
 
 ev_ev = dot(ev,ev,4);
 
