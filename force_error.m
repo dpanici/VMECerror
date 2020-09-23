@@ -16,7 +16,7 @@ dimV = 380;
 %% Define the (s,u,v) 3D grid on which we are evaluating the force error
 s = linspace(0,1,dimS);
 u = linspace(0,2*pi,dimU);
-v = linspace(0,2*pi/data.nfp,dimV);
+v = linspace(0,2*pi,dimV);
 
 suvgrid = ndgrid(s,u,v);
 
@@ -186,7 +186,7 @@ BU = (chir - Phir.*L_v)./g;
 % define at magnetic axis
 BU(1,:,:) = (chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) ./ gs(1,:,:);
 
-BV = -Phir .* (1 + L_u)./g;
+BV = Phir .* (1 + L_u)./g;
 %define at magnetic axis 
 BV(1,:,:) = (Phir(1,:,:).* -L_su(1,:,:)) ./ gs(1,:,:); % L_su is NOT zero, we can define it (L_u is maybe zero tho)
 
