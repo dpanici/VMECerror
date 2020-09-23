@@ -16,7 +16,7 @@ dimV = 380;
 %% Define the (s,u,v) 3D grid on which we are evaluating the force error
 s = linspace(0,1,dimS);
 u = linspace(0,2*pi,dimU);
-v = linspace(0,2*pi,dimV);
+v = linspace(0,2*pi/data.nfp,dimV);
 
 suvgrid = ndgrid(s,u,v);
 
@@ -67,17 +67,6 @@ Z_uv = eval_series(suvgrid, zuvmns, data, 's');
 L_u = eval_series(suvgrid, lumnc, data, 'c');
 L_v = eval_series(suvgrid, lvmnc, data, 'c');
 
-% VMEC2000
-% https://github.com/PrincetonUniversity/STELLOPT/blob/4b84cce109ba2e8e9cadbca0c7c8c2117dce13ba/VMEC2000/Sources/General/bcovar.f
-% Line 170 lambda derivs are scaled by LAMSCALE
-% https://github.com/PrincetonUniversity/STELLOPT/blob/4b84cce109ba2e8e9cadbca0c7c8c2117dce13ba/VMEC2000/Sources/Initialization_Cleanup/profil1d.f
-% LAMSCALE is defined at line 103 of above
-% phipstotal = sum(Phi(2:end).^(2));
-% hs = Phi(3)-Phi(2);
-% lamscale = sqrt(hs*phipstotal);
-% L_u = L_u .* lamscale;
-% L_v = L_v .* lamscale;
-
 L_uu = eval_series(suvgrid, luumns, data, 's');
 L_vv = eval_series(suvgrid, lvvmns, data, 's');
 L_uv = eval_series(suvgrid, luvmns, data, 's');
@@ -121,7 +110,6 @@ Z_ssuu = eval_series(suvgrid, zssuumns, data, 's');
 R_ssuv = eval_series(suvgrid, rssuvmnc, data, 'c');
 Z_ssuv = eval_series(suvgrid, zssuvmns, data, 's');
 
-plot_derivs
 
 %% covariant basis vector
 es = cat(4,R_s,zeros(size(R_s)),Z_s);
@@ -185,7 +173,7 @@ eV = cross(es,eu,4)./g;
 %% metric tensor components
 gss = dot(eS,eS,4);
 % define gss at magnetic axis
-temp1= cross(eus,ev,4)./gs;
+temp1= cross(eus,ev,4)./gs;% gotten from limit of gss at s->0
 temp2 = dot(temp1,temp1,4);
 gss(1,:,:)=temp2(1,:,:);
 
@@ -198,22 +186,20 @@ BU = (chir - Phir.*L_v)./g;
 % define at magnetic axis
 BU(1,:,:) = (chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) ./ gs(1,:,:);
 
-% 
-
-BV = Phir .* (1 + L_u)./g;
+BV = -Phir .* (1 + L_u)./g;
 %define at magnetic axis 
 BV(1,:,:) = (Phir(1,:,:).* -L_su(1,:,:)) ./ gs(1,:,:); % L_su is NOT zero, we can define it (L_u is maybe zero tho)
 
 %% partial derivatives of contravariant B components
-BU_s = - gs./g .* (chir - Phir.*L_v) + (chirr - Phir .* L_sv)./g;
-BU_u = - gu./g .* (chir - Phir.*L_v) + ( - Phir .* L_uv)./g;
-BU_v = - gv./g .* (chir - Phir.*L_v) + ( - Phir .* L_vv)./g;
+BU_s = - gs./g./g .* (chir - Phir.*L_v) + (chirr - Phir .* L_sv)./g;
+BU_u = - gu./g./g .* (chir - Phir.*L_v) + ( - Phir .* L_uv)./g;
+BU_v = - gv./g./g .* (chir - Phir.*L_v) + ( - Phir .* L_vv)./g;
 
-BV_s = (-gs./g .* Phir).*(1 - L_u) + Phir./g .* (-L_su);
-BV_u = - gu./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uu);
-BV_v = - gv./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uv);
+BV_s = (-gs./g./g .* Phir).*(1 - L_u) + Phir./g .* (-L_su);
+BV_u = - gu./g./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uu);
+BV_v = - gv./g./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uv);
 
-%% Define above at the magnetic axis
+% Define above at the magnetic axis
 BU_s(1,:,:) = (-g_sss(1,:,:) .*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - g_ss(1,:,:).*(chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) + gs(1,:,:).*(-Phir(1,:,:).*L_ssv(1,:,:)))...
  ./ 2 ./ (gs(1,:,:).^2);
 BU_u(1,:,:) = (-g_ssu(1,:,:).*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - 2.*g_su(1,:,:).*(chirr(1,:,:)-Phir(1,:,:).*L_sv(1,:,:)) + gu(1,:,:).*Phir(1,:,:).*L_ssv(1,:,:) )...
@@ -245,15 +231,15 @@ JV(1,:,:) = (Bu_s(1,:,:) - Bs_u(1,:,:)) ./ mu0;
 %% Magnitudes of direction vectors
 mag_eS = sqrt(gss);
 mag_beta = g .* sqrt((BV.^2).*guu + (BU.^2).*gvv - 2.*BV.*BU.*guv);
-new_mag_beta = sqrt((BV.^2).*dot(cross(ev,es,4),cross(ev,es,4),4) + (BU.^2).*dot(cross(es,eu,4),cross(es,eu,4),4) - 2.*BV.*BU.*dot(cross(ev,es,4),cross(es,eu,4),4));
-min(ismembertol(abs(mag_beta(2:end,:,:)),new_mag_beta(2:end,:,:),1e-2),[],'all'); % can write beta without the magnitude of the Jacobian, tho it is
+new_mag_beta = sqrt((BV.^2).*dot(cross(ev,es,4),cross(ev,es,4),4) + (BU.^2).*dot(cross(es,eu,4),cross(es,eu,4),4) - 2.*BV.*BU.*dot(cross(ev,es,4),cross(es,eu,4),4));% just checking that if beta written with g cancelled with the denominators of gss,guu, is the same as the above line (it is)
+beta_is_same = min(ismembertol(abs(mag_beta(2:end,:,:)),new_mag_beta(2:end,:,:),1e-2),[],'all'); % can write beta without the magnitude of the Jacobian, tho it is
 %zero at the magnetic axis. 
 %mag_beta(1,:,:) = BV(1,:,:);
 %% Magnitude of Force error (N/m3)
 F_s = g .* (JV.*BU - JU.* BV) + presr;
 F_s(1,:,:) = (JV(1,:,:).*BU(1,:,:) - JU(1,:,:).*BV(1,:,:)) + presr(1,:,:);% define at axis by cancelling the g's
 F_beta = JS;
-beta_comp = F_beta .* mag_beta;
+% beta_comp = F_beta .* mag_beta;
 % beta_comp(1,:,:) = 
 
 F = sqrt((F_s.^2).*gss) + (F_beta.^2).*(mag_beta.^2);
