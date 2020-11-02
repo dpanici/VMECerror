@@ -2,7 +2,7 @@
 
 % d = read_vmec('wout_HELIOTRON_16x4x4.nc');
 d = data;
-xn = d.xn;
+xn = -d.xn;
 xm = d.xm;
 
 % matlabvmec uses (mu+nv) convention, so my fourer coeffs involving v derivs
@@ -53,7 +53,7 @@ assert(isequal(rumns, d.rumns)) % check against VMEC output  which also calculat
 % R_v =  rmnc * n*nfp*sin(m*u - n*v*nfp)
 rvmns = d.rmnc .* xn';%.* d.nfp;
 
-assert(isequal(-rvmns, d.rvmns)) % must assert the - of ours is equal bc matlabvmec uses (mu-nvnfp)
+assert(isequal(rvmns, d.rvmns)) % must assert the - of ours is equal bc matlabvmec uses (mu-nvnfp)
 
 % R_uu = -rmnc * m^2 * cos(m*u - n*v*nfp)
 ruumnc = -d.rmnc .* (xm.^2)';
@@ -72,7 +72,7 @@ assert(isequal(zumnc,d.zumnc))
 % Z_v = -zmns * n * nfp * cos(m*u - n*v*nfp)
 zvmnc = -d.zmns .* xn';
 
-assert(isequal(-zvmnc,d.zvmnc))
+assert(isequal(zvmnc,d.zvmnc))
 
 % Z_uu = -zmns * m^2 * sin(m*u - n*v*nfp)
 zuumns = -d.zmns .* (xm.^2)';

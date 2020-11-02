@@ -2,8 +2,9 @@
 clearvars, close all
 % file = 'wout_HELIOTRON_32x8x8.nc';
 % file = 'wout_HELIOTRON_16x4x4.nc';
-file = 'wout_HELIOTRON.nc';
-% file = 'wout_DSHAPE.nc';
+% file = 'wout_HELIOTRON.nc';
+file = 'wout_DSHAPE.nc';
+
 
 data = read_vmec(file);
 
@@ -29,11 +30,11 @@ iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv(iota,data))',1,dimU,dimV); % radial deriv or rotational transform
 
 
-Phi = data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
+Phi = -data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
 % chi, Phi are actually the normalized fluxes
 Phir = s_deriv(Phi,data);
 chi = data.chi./2./pi; % poloidal flux
-chir = repmat((-iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
+chir = repmat((iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
 Phir = repmat(Phir',1,dimU,dimV); % radial deriv of toroidal flux (constant =1 for Heliotron case)
 chirr = iotar .* Phir;
 
@@ -246,6 +247,7 @@ F = sqrt((F_s.^2).*gss) + (F_beta.^2).*(mag_beta.^2);
 
 %% Plot
 plot_force_error
+debug_plot_quants
 % [s1,u1,v1] = ndgrid(s,u,v);
 % [s_vol,u,v] = ndgrid(s_vol,u,v); % don't do this, interp the derivs and R,Z instead
 % Rint = griddedInterpolant(s1,u1,v1,R,'linear');
