@@ -106,46 +106,46 @@ lvvmns = - d.lmns .* (xn.^2)';
 luvmns = d.lmns .* xm' .* xn'; % for some reason sign is flipped or something here
 
 %% Numerical first radial derivatives
-rsmnc = s_deriv(d.rmnc,d); %R_s
-zsmns = s_deriv(d.zmns,d); %Z_s
-rsvmns = s_deriv(rvmns,d); %R_sv
-rsumns = s_deriv(d.rumns,d); %R_su
-zsvmnc = s_deriv(zvmnc,d); %Z_sv
-zsumnc = s_deriv(d.zumnc,d); %Z_su
+rsmnc = s_deriv(d.rmnc,d,deriv_method); %R_s
+zsmns = s_deriv(d.zmns,d,deriv_method); %Z_s
+rsvmns = s_deriv(rvmns,d,deriv_method); %R_sv
+rsumns = s_deriv(d.rumns,d,deriv_method); %R_su
+zsvmnc = s_deriv(zvmnc,d,deriv_method); %Z_sv
+zsumnc = s_deriv(d.zumnc,d,deriv_method); %Z_su
 
-rsuumnc = s_deriv(ruumnc,d); %R_suu
-zsuumns = s_deriv(zuumns,d); %Z_suu
-rsuvmnc = s_deriv(ruvmnc,d); %R_suv
-zsuvmns = s_deriv(zuvmns,d); %Z_suv
+rsuumnc = s_deriv(ruumnc,d,deriv_method); %R_suu
+zsuumns = s_deriv(zuumns,d,deriv_method); %Z_suu
+rsuvmnc = s_deriv(ruvmnc,d,deriv_method); %R_suv
+zsuvmns = s_deriv(zuvmns,d,deriv_method); %Z_suv
 
-rsvvmnc = s_deriv(rvvmnc,d); %R_svv
-zsvvmns = s_deriv(zvvmns,d); %Z_svv
+rsvvmnc = s_deriv(rvvmnc,d,deriv_method); %R_svv
+zsvvmns = s_deriv(zvvmns,d,deriv_method); %Z_svv
 
 
 
-lsumnc = s_deriv(lumnc,d); %L_su
-lsvmnc = s_deriv(lvmnc,d); %L_sv
-lsvvmns = s_deriv(lvvmns,d); %L_svv
+lsumnc = s_deriv(lumnc,d,deriv_method); %L_su
+lsvmnc = s_deriv(lvmnc,d,deriv_method); %L_sv
+lsvvmns = s_deriv(lvvmns,d,deriv_method); %L_svv
 %% Numerical second radial derivatives
-rssmnc = s2_deriv(d.rmnc,d); %R_ss
-zssmns = s2_deriv(d.zmns,d); %Z_ss
+rssmnc = s2_deriv(d.rmnc,d,deriv_method); %R_ss
+zssmns = s2_deriv(d.zmns,d,deriv_method); %Z_ss
 
-rssumns = s2_deriv(d.rumns,d); %R_ssu
-zssumnc = s2_deriv(d.zumnc,d); %Z_ssu
-rssvmns = s2_deriv(rvmns,d); %R_ssv
-zssvmnc = s2_deriv(zvmnc,d); %Z_ssv
+rssumns = s2_deriv(d.rumns,d,deriv_method); %R_ssu
+zssumnc = s2_deriv(d.zumnc,d,deriv_method); %Z_ssu
+rssvmns = s2_deriv(rvmns,d,deriv_method); %R_ssv
+zssvmnc = s2_deriv(zvmnc,d,deriv_method); %Z_ssv
 
-rssuvmnc = s2_deriv(ruvmnc,d); %R_ussv
-zssuvmns = s2_deriv(zuvmns,d); %Z_ussv
+rssuvmnc = s2_deriv(ruvmnc,d,deriv_method); %R_ussv
+zssuvmns = s2_deriv(zuvmns,d,deriv_method); %Z_ussv
 
-rssuumnc = s2_deriv(ruumnc,d); %R_ssuu
-zssuumns = s2_deriv(zuumns,d); %Z_ssuu
+rssuumnc = s2_deriv(ruumnc,d,deriv_method); %R_ssuu
+zssuumns = s2_deriv(zuumns,d,deriv_method); %Z_ssuu
 
-lssvmnc = s2_deriv(lvmnc,d); %L_ssv
+lssvmnc = s2_deriv(lvmnc,d,deriv_method); %L_ssv
 
 %% Numerical third radial derivatives
-rsssmnc = s3_deriv(d.rmnc,d); %R_sss
-zsssmns = s3_deriv(d.zmns,d); %Z_sss
+rsssmnc = s3_deriv(d.rmnc,d,deriv_method); %R_sss
+zsssmns = s3_deriv(d.zmns,d,deriv_method); %Z_sss
 
-rsssumns = s3_deriv(d.rumns,d); %R_sssu
-zsssumnc = s3_deriv(d.zumnc,d); %Z_sssu
+rsssumns = s3_deriv(d.rumns,d,deriv_method); %R_sssu
+zsssumnc = s3_deriv(d.zumnc,d,deriv_method); %Z_sssu

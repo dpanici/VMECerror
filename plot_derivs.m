@@ -1,4 +1,4 @@
-close all
+% close all
 % Script for use after running force_error, so suvgrid and real-space
 % quantities are already defined
 
@@ -25,8 +25,8 @@ close all
 % derivplot(Z,Z_u,u) % good
 % derivplot(R,R_v,v) % good
 % derivplot(Z,Z_v,v) % good
-derivplot(L,L_u,u) % good % Matches VMECplot
-derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
+% derivplot(L,L_u,u) % good % Matches VMECplot
+% derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 %  
 % derivplot(R_u,R_uu,u) % good
 % derivplot(Z_u,Z_uu,u) % good
@@ -43,11 +43,11 @@ derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 % derivplot(L_v,L_uv,u) % good
 
 %% Radial Derivatives
-% derivplot(R,R_s,s) % good
-% derivplot(Z,Z_s,s) % good
+derivplot(R,R_s,s) % good
+derivplot(Z,Z_s,s) % good
 % 
-% derivplot(R_s,R_ss,s) % good
-% derivplot(Z_s,Z_ss,s) % good
+derivplot(R_s,R_ss,s) % good
+derivplot(Z_s,Z_ss,s) % good
 % 
 % derivplot(R_u,R_su,s) % good
 % derivplot(Z_u,Z_su,s) % good
@@ -78,7 +78,7 @@ derivname = inputname(2);
 wrtname = inputname(3);
 sindex=5;
 uindex=5;
-vindex=5;
+vindex=1;
 figure()
 yyaxis left
 if wrtname == 'u'

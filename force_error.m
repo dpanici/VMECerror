@@ -1,19 +1,27 @@
 % Calculate Force error
-clearvars, close all
+clearvars%, close all
 % file = 'wout_HELIOTRON_32x8x8.nc';
 % file = 'wout_HELIOTRON_16x4x4.nc';
 % file = 'wout_HELIOTRON.nc';
-file = 'wout_DSHAPE.nc';
+file = 'wout_DSHAPE_M20_Vac.nc';
 
 
 data = read_vmec(file);
+
+% deriv_method='finite difference'; % Spline, etc
+deriv_method='spline';
+
 
 %% constants
 mu0 = 4*pi * 1e-7;
 
 dimS = data.ns;
 dimU = 50;
-dimV = 380;
+if data.nfp > 1
+    dimV = 20*data.nfp;
+else
+    dimV = 1;
+end
 %% Define the (s,u,v) 3D grid on which we are evaluating the force error
 s = linspace(0,1,dimS);
 u = linspace(0,2*pi,dimU);
@@ -27,12 +35,12 @@ volgrid = ndgrid(s_vol,u,v);
 
 %% Flux, iota,and pressure derivs
 iota = data.iotaf;% rotational transform
-iotar = repmat((s_deriv(iota,data))',1,dimU,dimV); % radial deriv or rotational transform
+iotar = repmat((s_deriv(iota,data,deriv_method))',1,dimU,dimV); % radial deriv or rotational transform
 
 
 Phi = -data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
 % chi, Phi are actually the normalized fluxes
-Phir = s_deriv(Phi,data);
+Phir = s_deriv(Phi,data,deriv_method);
 chi = data.chi./2./pi; % poloidal flux
 chir = repmat((iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
 Phir = repmat(Phir',1,dimU,dimV); % radial deriv of toroidal flux (constant =1 for Heliotron case)
@@ -40,7 +48,7 @@ chirr = iotar .* Phir;
 
 iota = repmat(iota',1,dimU,dimV);
 
-presr = s_deriv(data.presf,data);
+presr = s_deriv(data.presf,data,deriv_method);
 presr = repmat(presr',1,dimU,dimV);
 %% Flux surface locations
 R = eval_series(suvgrid,data.rmnc,data,'c');
@@ -246,8 +254,9 @@ F_beta = JS;
 F = sqrt((F_s.^2).*gss) + (F_beta.^2).*(mag_beta.^2);
 
 %% Plot
-plot_force_error
-debug_plot_quants
+% plot_force_error
+% debug_plot_quants
+get_energy
 % [s1,u1,v1] = ndgrid(s,u,v);
 % [s_vol,u,v] = ndgrid(s_vol,u,v); % don't do this, interp the derivs and R,Z instead
 % Rint = griddedInterpolant(s1,u1,v1,R,'linear');
