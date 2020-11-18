@@ -3,7 +3,8 @@ clearvars%, close all
 % file = 'wout_HELIOTRON_32x8x8.nc';
 % file = 'wout_HELIOTRON_16x4x4.nc';
 % file = 'wout_HELIOTRON.nc';
-file = 'wout_DSHAPE_M20_Vac.nc';
+% file = 'wout_DSHAPE_M20_Vac.nc';
+file = 'wout_DSHAPE.nc';
 
 
 data = read_vmec(file);
@@ -233,6 +234,7 @@ Bu_v = dot( BU_v.*eu + BU.*euv+ BV_v.*ev + BV .*evv,eu,4) + dot(BU.*eu + BV.*ev,
 JS = (Bv_u - Bu_v) ./ mu0 ./ g;
 JU = (Bs_v - Bv_s) ./ mu0 ./ g;
 JU(1,:,:) = (Bs_v(1,:,:) - Bv_s(1,:,:)) ./ mu0; %at axis g is zero, cancel it out with the g in the Fs eqn
+
 JV = (Bu_s - Bs_u) ./ mu0 ./ g;
 JV(1,:,:) = (Bu_s(1,:,:) - Bs_u(1,:,:)) ./ mu0;
 
@@ -251,7 +253,7 @@ F_beta = JS;
 % beta_comp = F_beta .* mag_beta;
 % beta_comp(1,:,:) = 
 
-F = sqrt((F_s.^2).*gss) + (F_beta.^2).*(mag_beta.^2);
+F = sqrt((F_s.^2).*gss + (F_beta.^2).*(mag_beta.^2));
 
 %% Plot
 % plot_force_error
