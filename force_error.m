@@ -12,7 +12,7 @@ data = read_vmec(file);
 
 deriv_method='finite difference'; % finite difference or spline
 % deriv_method='spline';
-numerical_covariant_B_derivs = false; % calculate cov_B derivs analytically or numerically
+numerical_covariant_B_derivs = true; % calculate cov_B derivs analytically or numerically
 interpolate = true; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
 
 %% constants

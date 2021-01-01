@@ -44,3 +44,5 @@ for i=1:data.ns
         title(sprintf('ev $\cdot$ eV at s =%f',data.phi(i)))
     end
 end
+
+% check cross terms
