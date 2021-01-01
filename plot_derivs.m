@@ -26,28 +26,28 @@
 % derivplot(R,R_v,v) % good
 % derivplot(Z,Z_v,v) % good
 % derivplot(L,L_u,u) % good % Matches VMECplot
-% derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
+derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 %  
 % derivplot(R_u,R_uu,u) % good
 % derivplot(Z_u,Z_uu,u) % good
 % derivplot(R_v,R_vv,v) % good
 % derivplot(Z_v,Z_vv,v) % good
 % derivplot(L_u,L_uu,u) % good
-% derivplot(L_v,L_vv,v) % good
+derivplot(L_v,L_vv,v) % good
 % 
 % derivplot(R_u,R_uv,v) % good
 % derivplot(Z_u,Z_uv,v) % good
 % derivplot(R_v,R_uv,u) % good
 % derivplot(Z_v,Z_uv,u) % good
-% derivplot(L_u,L_uv,v) % good
-% derivplot(L_v,L_uv,u) % good
+derivplot(L_u,L_uv,v) % good
+derivplot(L_v,L_uv,u) % good
 
 %% Radial Derivatives
-derivplot(R,R_s,s) % good
-derivplot(Z,Z_s,s) % good
-% 
-derivplot(R_s,R_ss,s) % good
-derivplot(Z_s,Z_ss,s) % good
+% derivplot(R,R_s,s) % good
+% derivplot(Z,Z_s,s) % good
+% % 
+% derivplot(R_s,R_ss,s) % good
+% derivplot(Z_s,Z_ss,s) % good
 % 
 % derivplot(R_u,R_su,s) % good
 % derivplot(Z_u,Z_su,s) % good
@@ -55,8 +55,8 @@ derivplot(Z_s,Z_ss,s) % good
 % derivplot(Z_v,Z_sv,s) % good
 % derivplot(L_u,L_su,s) % good
 % derivplot(L_v,L_sv,s) % good
-derivplot(BU,BU_s,s)
-derivplot(BU,BU_u,u)
+% derivplot(BU,BU_s,s)  % good
+% derivplot(BU,BU_u,u)  % good
 derivplot(BU,BU_v,v)
 
 derivplot(BV,BV_s,s)

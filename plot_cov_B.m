@@ -45,7 +45,8 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(data.phi(s_index:end),Bv_vmec(s_index:end,u_index,v_nfp_index),'k')
-legend('Analytic deriv', 'Numerical deriv','Zero', 'VMEC B_v')
+plot(data.phi(s_index:end),Bv(s_index:end,u_index,v_nfp_index),'r--')
+legend('Analytic deriv', 'Numerical deriv','Zero', 'VMEC B_v','My Bv')
 
 % Plot u derivs
 figure()
@@ -80,7 +81,8 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(u,Bv_vmec(s_index,:,v_nfp_index),'k')
-legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_v')
+plot(u,Bv(s_index,:,v_nfp_index),'r--')
+legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_v','My Bv')
 
 
 % Plot v derivs

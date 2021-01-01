@@ -10,9 +10,10 @@ file = 'VMECfiles/wout_DSHAPE.nc';
 
 data = read_vmec(file);
 
-deriv_method='finite difference'; % finite difference or spline
-% deriv_method='spline';
-numerical_covariant_B_derivs = true; % calculate cov_B derivs analytically or numerically
+% deriv_method='finite difference'; % finite difference or spline
+deriv_method='spline';
+numerical_covariant_B_derivs = false; % calculate cov_B derivs analytically or numerically
+numerical_contravariant_B_derivs = false; % calculate contra_B derivs analytically or numerically
 interpolate = true; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
 
 %% constants
@@ -211,9 +212,9 @@ BU_s = - gs./g./g .* (chir - Phir.*L_v) + (chirr - Phir .* L_sv)./g;
 BU_u = - gu./g./g .* (chir - Phir.*L_v) + ( - Phir .* L_uv)./g;
 BU_v = - gv./g./g .* (chir - Phir.*L_v) + ( - Phir .* L_vv)./g;
 
-BV_s = (-gs./g./g .* Phir).*(1 - L_u) + Phir./g .* (-L_su);
-BV_u = - gu./g./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uu);
-BV_v = - gv./g./g .*Phir .* (1 - L_u) + Phir./g .* (-L_uv);
+BV_s = (-gs./g./g .* Phir).*(1 + L_u) + Phir./g .* (L_su);
+BV_u = - gu./g./g .*Phir .* (1 + L_u) + Phir./g .* (L_uu);
+BV_v = - gv./g./g .*Phir .* (1 + L_u) + Phir./g .* (L_uv);
 
 % Define above at the magnetic axis
 BU_s(1,:,:) = (-g_sss(1,:,:) .*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - g_ss(1,:,:).*(chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) + gs(1,:,:).*(-Phir(1,:,:).*L_ssv(1,:,:)))...
@@ -226,6 +227,27 @@ BU_v(1,:,:) = (-g_ssv(1,:,:).*(chir(1,:,:) - Phir(1,:,:).*L_v(1,:,:)) - 2.*g_sv(
 BV_s(1,:,:) = ( -g_sss(1,:,:).*Phir(1,:,:)) ./ 2 ./ (gs(1,:,:).^2);
 BV_u(1,:,:) = (-g_ssu(1,:,:).*Phir(1,:,:)) ./ 2 ./ (gs(1,:,:).^2);
 BV_v(1,:,:) = ( -g_ssv(1,:,:).*Phir(1,:,:) ) ./ 2 ./ (gs(1,:,:).^2);
+
+% save as analytic to compare to numeric later
+BU_sa = BU_s;
+BU_ua = BU_u;
+BU_va = BU_v;
+BV_sa = BV_s;
+BV_ua = BV_u;
+BV_va = BV_v;
+
+%% numerical contravariant B derivatives
+if numerical_contravariant_B_derivs
+    BU_s = real_space_deriv(BU,s,deriv_method);
+    BU_u = real_space_deriv(BU,u,deriv_method);
+    BU_v = real_space_deriv(BU,v,deriv_method);
+    BV_s = real_space_deriv(BV,s,deriv_method);
+    BV_u = real_space_deriv(BV,u,deriv_method);
+    BV_v = real_space_deriv(BV,v,deriv_method);
+    plot_contr_B_derivs
+end
+
+
 %% covariant B derivatives
 Bu_s = dot( BU_s.*eu + BU.*eus+ BV_s.*ev + BV .*evs,eu,4) + dot(BU.*eu + BV.*ev,eus,4);
 Bv_s = dot( BU_s.*eu + BU.*eus+ BV_s.*ev + BV .*evs,ev,4) + dot(BU.*eu + BV.*ev,evs,4);
@@ -278,7 +300,7 @@ if numerical_covariant_B_derivs
 
     Bv_s = real_space_deriv(Bv,s,deriv_method);
     Bv_u = real_space_deriv(Bv,u,deriv_method);
-    plot_cov_B
+%     plot_cov_B
 end
 
 

@@ -16,11 +16,11 @@ s_index=30; % index of s to plot quantities at (that arent plotted versus s)
 
 %% surface plot check that my cov B and contrav B give same result for |B|
 
-run('plotting/compare_mag_B_cov_contr')
+% run('plotting/compare_mag_B_cov_contr')
 
 %% plot ||B||
 
-run('plotting/compare_mag_B')
+% run('plotting/compare_mag_B')
 
 %% Plot B^u
 
@@ -31,7 +31,7 @@ run('plotting/compare_mag_B')
 % run('plotting/compare_BV')
 
 %% Plot J^u, J^v (Units?)
-% run('plotting/compare_J')
+run('plotting/compare_J')
 
 %% Plot g
 
