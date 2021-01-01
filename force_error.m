@@ -1,23 +1,25 @@
 % Calculate Force error
 clearvars%, close all
-% file = 'wout_HELIOTRON_32x8x8.nc';
-% file = 'wout_HELIOTRON_16x4x4.nc';
-% file = 'wout_HELIOTRON.nc';
-% file = 'wout_DSHAPE_M20_Vac.nc';
-file = 'wout_DSHAPE.nc';
-
+% file = 'VMECfiles/wout_HELIOTRON_32x8x8.nc';
+% file = 'VMECfiles/wout_HELIOTRON_16x4x4.nc';
+% file = 'VMECfiles/wout_HELIOTRON.nc';
+% file = 'VMECfiles/wout_DSHAPE_M20_Vac.nc';
+file = 'VMECfiles/wout_DSHAPE.nc';
+% file = 'VMECfiles/wout_HELIOTRON_Vac.nc';
+% file = 'VMECfiles/wout_SOLOVEV.nc';
 
 data = read_vmec(file);
 
-% deriv_method='finite difference'; % Spline, etc
-deriv_method='spline';
-
+deriv_method='finite difference'; % finite difference or spline
+% deriv_method='spline';
+numerical_covariant_B_derivs = false; % calculate cov_B derivs analytically or numerically
+interpolate = true; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
 
 %% constants
 mu0 = 4*pi * 1e-7;
 
 dimS = data.ns;
-dimU = 50;
+dimU = 100;
 if data.nfp > 1
     dimV = 20*data.nfp;
 else
@@ -30,9 +32,11 @@ v = linspace(0,2*pi,dimV);
 
 suvgrid = ndgrid(s,u,v);
 
-volS = 150;
-s_vol = linspace(0,1,volS);
-volgrid = ndgrid(s_vol,u,v);
+if interpolate
+   fine_dimS = 5*dimS;
+   fine_s = linspace( 0,1,fine_dimS);
+end
+
 
 %% Flux, iota,and pressure derivs
 iota = data.iotaf;% rotational transform
@@ -195,6 +199,8 @@ guv = dot(eU,eV,4);
 BU = (chir - Phir.*L_v)./g;
 % define at magnetic axis
 BU(1,:,:) = (chirr(1,:,:) - Phir(1,:,:).*L_sv(1,:,:)) ./ gs(1,:,:);
+% L_sv is zero at axis rn, at least for SOLOVEV, is this right? It is
+% axisymmetric so maybe
 
 BV = Phir .* (1 + L_u)./g;
 %define at magnetic axis 
@@ -229,6 +235,54 @@ Bv_u = dot( BU_u.*eu + BU.*euu+ BV_u.*ev + BV .*evu,ev,4) + dot(BU.*eu + BV.*ev,
 
 Bs_v = dot( BU_v.*eu + BU.*euv+ BV_v.*ev + BV .*evv,es,4) + dot(BU.*eu + BV.*ev,esv,4);
 Bu_v = dot( BU_v.*eu + BU.*euv+ BV_v.*ev + BV .*evv,eu,4) + dot(BU.*eu + BV.*ev,euv,4);
+% mark as analytic derivatives, as opposed to numeric like I calc later for
+% comparison
+Bu_sa = Bu_s;
+Bv_sa = Bv_s;
+
+Bs_ua = Bs_u;
+Bv_ua = Bv_u;
+
+Bs_va = Bs_v;
+Bu_va = Bu_v;
+
+%% covariant B components
+g_ss = dot(es,es,4);
+g_su = dot(es,eu,4);
+g_sv = dot(es,ev,4);
+
+g_us = dot(eu,es,4);
+g_uu = dot(eu,eu,4);
+g_uv = dot(eu,ev,4);
+
+g_vs = dot(ev,es,4);
+g_vu = dot(ev,eu,4);
+g_vv = dot(ev,ev,4);
+
+Bs = BU.*g_us + BV .* g_vs;
+Bu = BU.*g_uu + BV .* g_vu;
+Bv = BU.*g_uv + BV .* g_vv;
+
+%% numerical covariant B derivatives
+
+% Bs = eval_series_nyq(suvgrid,data.bsubsmns,data,'s');
+% Bu = eval_series_nyq(suvgrid,data.bsubumnc,data,'c');
+% Bv = eval_series_nyq(suvgrid,data.bsubvmnc,data,'c');
+
+if numerical_covariant_B_derivs
+    Bs_u = real_space_deriv(Bs,u,deriv_method);
+    Bs_v = real_space_deriv(Bs,v,deriv_method);
+
+    Bu_s = real_space_deriv(Bu,s,deriv_method);
+    Bu_v = real_space_deriv(Bu,v,deriv_method);
+
+    Bv_s = real_space_deriv(Bv,s,deriv_method);
+    Bv_u = real_space_deriv(Bv,u,deriv_method);
+    plot_cov_B
+end
+
+
+
 
 %% Contravariant current (J) components
 JS = (Bv_u - Bu_v) ./ mu0 ./ g;
@@ -256,7 +310,7 @@ F_beta = JS;
 F = sqrt((F_s.^2).*gss + (F_beta.^2).*(mag_beta.^2));
 
 %% Plot
-% plot_force_error
+plot_force_error
 % debug_plot_quants
 get_energy
 % [s1,u1,v1] = ndgrid(s,u,v);

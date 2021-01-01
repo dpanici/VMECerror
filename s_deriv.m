@@ -7,6 +7,7 @@ function value_s_deriv=s_deriv(fourier_coeffs,data,deriv_method)
 % This method yields a multi-values derivative at the s=0 magnetic axis
 value_s_deriv = zeros(size(fourier_coeffs));
 
+
 if strcmp(deriv_method,'finite difference')
     for i=2:data.ns-1
         value_s_deriv(:,i) = (fourier_coeffs(:,i+1) - fourier_coeffs(:,i-1)) / (data.phi(i+1) - data.phi(i-1));

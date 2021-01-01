@@ -15,11 +15,6 @@ xm = d.xm;
 % flux surface defined by s=1
 % in vmec outputs rmnc, etc, s goes from 1/ns to the 1
 
-%I think raxiscc and zaxiscs are the fourier coeffs of the magnetic axis
-%(as the components they have do not have any poloidal modes)
-
-
-
 % need to first be able to get the derivs wrt u,v at the discrete s
 % surfaces we have
 
@@ -83,12 +78,12 @@ zvvmns = - d.zmns .* (xn.^2)';
 % Z_uv = zmns * m * n * nfp * sin(m*u - n*v*nfp)
 zuvmns = d.zmns .* xm' .* xn';
 
-% Convert lambda from the half-grid onto the full grid
-% 
-% lmns = zeros(size(d.lmns));
-% lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2);
-% lmns(:,2:d.ns) = 0.5 * (d.lmns(:,1:d.ns-1) + d.lmns(:,2:d.ns));
-% lmns(:,end) = 2 * d.lmns(end) - d.lmns(d.ns-2);
+% Convert lambda from the half-mesh onto the full mesh
+%  just linear interpolation onto the full mesh from the half-mesh
+lmns = zeros(size(d.lmns));
+lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2); % should be axis limit for lambda
+lmns(:,2:d.ns) = 0.5 * (d.lmns(:,1:d.ns-1) + d.lmns(:,2:d.ns));
+lmns(:,end) = 2 * d.lmns(end) - d.lmns(d.ns-2);
 
 %L_u = lmns * m * cos(m*u-n*v*nfp)
 lumnc = d.lmns .* xm';

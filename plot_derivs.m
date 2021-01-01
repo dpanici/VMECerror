@@ -55,6 +55,13 @@ derivplot(Z_s,Z_ss,s) % good
 % derivplot(Z_v,Z_sv,s) % good
 % derivplot(L_u,L_su,s) % good
 % derivplot(L_v,L_sv,s) % good
+derivplot(BU,BU_s,s)
+derivplot(BU,BU_u,u)
+derivplot(BU,BU_v,v)
+
+derivplot(BV,BV_s,s)
+derivplot(BV,BV_u,u)
+derivplot(BV,BV_v,v)
 
 
 % 
@@ -71,42 +78,3 @@ derivplot(Z_s,Z_ss,s) % good
 % xlabel('u')
 % ylabel('dR/ds')
 
-function foo = derivplot(value,deriv,var_wrt_to)
-% plot a value and its deriv against a variable the deriv is wrt to, 
-valname = inputname(1);
-derivname = inputname(2);
-wrtname = inputname(3);
-sindex=5;
-uindex=5;
-vindex=1;
-figure()
-yyaxis left
-if wrtname == 'u'
-    plot(var_wrt_to,value(sindex,:,vindex))
-elseif wrtname == 's'
-    plot(var_wrt_to,value(:,uindex,vindex))
-elseif wrtname == 'v'
-    plot(var_wrt_to,reshape(value(sindex,uindex,:),size(var_wrt_to)))
-end     
-hold on
-ylabel(valname)
-yyaxis right
-if wrtname == 'u'
-    plot(var_wrt_to,deriv(sindex,:,vindex))
-elseif wrtname == 's'
-    plot(var_wrt_to,deriv(:,uindex,vindex))
-elseif wrtname == 'v'
-    plot(var_wrt_to,reshape(deriv(sindex,uindex,:),size(var_wrt_to)))
-end     
-hold on
-yline(0,'--')
-title(sprintf('%s and %s versus %s',valname,derivname,wrtname))
-xlabel(wrtname)
-ylabel(derivname)
-legend(valname,derivname)
-set(gcf, 'Position',  [200, 200, 1000, 800])
-
-% fin dif to approx the deriv, use ismembertol to check that the fin dif is
-% similar to the calculated deriv
-
-end
