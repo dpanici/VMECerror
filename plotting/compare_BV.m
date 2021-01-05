@@ -75,4 +75,41 @@ colormap jet
 xlabel('R (m)')
 ylabel('Z (m)')
 axis equal
-title(sprintf('Difference btwn my B^v and VMEC at nfp*phi=%f',v(nfp_v_index)))
+title(sprintf('log scale difference btwn my B^v and VMEC at nfp*phi=%f',v(nfp_v_index)))
+
+
+%% plot surfaces
+quant = BV;
+quant_str = 'BV';
+quant_vmec = BV_vmec;
+
+% s,u
+figure()
+pcolor(u,s,abs(quant(:,:,nfp_v_index) - quant_vmec(:,:,nfp_v_index)))
+colormap jet
+caxis([0,0.01])
+colorbar
+xlabel('u')
+ylabel('s')
+title(sprintf('Abs Difference in my %s and VMEC at v = %f',quant_str,v(v_nfp_index)))
+%s,v
+figure()
+pcolor(v,s,reshape(abs(quant(:,u_index,:) - quant_vmec(:,u_index,:)),[dimS,dimV]))
+colormap jet
+caxis([0,0.01])
+colorbar
+xlabel('v')
+ylabel('s')
+title(sprintf('Abs Difference in my %s and VMEC at u = %f',quant_str,u(u_index)))
+
+%u,v
+figure()
+pcolor(v,u,reshape(abs(quant(s_index,:,:) - quant_vmec(s_index,:,:)),[dimU,dimV]))
+colormap jet
+caxis([0,0.01])
+colorbar
+xlabel('v')
+ylabel('u')
+title(sprintf('Abs Difference in my %s and VMEC at s = %f',quant_str,data.phi(s_index)))
+
+

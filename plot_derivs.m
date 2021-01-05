@@ -33,14 +33,14 @@ derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 % derivplot(R_v,R_vv,v) % good
 % derivplot(Z_v,Z_vv,v) % good
 % derivplot(L_u,L_uu,u) % good
-derivplot(L_v,L_vv,v) % good
+% derivplot(L_v,L_vv,v) % good
 % 
 % derivplot(R_u,R_uv,v) % good
 % derivplot(Z_u,Z_uv,v) % good
 % derivplot(R_v,R_uv,u) % good
 % derivplot(Z_v,Z_uv,u) % good
-derivplot(L_u,L_uv,v) % good
-derivplot(L_v,L_uv,u) % good
+% derivplot(L_u,L_uv,v) % good
+% derivplot(L_v,L_uv,u) % good
 
 %% Radial Derivatives
 % derivplot(R,R_s,s) % good
@@ -57,11 +57,11 @@ derivplot(L_v,L_uv,u) % good
 % derivplot(L_v,L_sv,s) % good
 % derivplot(BU,BU_s,s)  % good
 % derivplot(BU,BU_u,u)  % good
-derivplot(BU,BU_v,v)
+% derivplot(BU,BU_v,v)
 
 derivplot(BV,BV_s,s)
-derivplot(BV,BV_u,u)
-derivplot(BV,BV_v,v)
+% derivplot(BV,BV_u,u)
+% derivplot(BV,BV_v,v)
 
 
 % 

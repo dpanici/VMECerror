@@ -15,7 +15,7 @@ BV_vmec = eval_series_nyq(volgrid,data.bsupvmnc,data,'c');
 % magB_vmec = (BU_vmec.^2).*dot(eu,eu,4) + (BV_vmec.^2).*dot(ev,ev,4);
 magB_vmec = eval_series_nyq(suvgrid,data.bmnc,data,'c');
 magB_vmec_sq = magB_vmec.^2;
-g_vmec = abs(eval_series_nyq(volgrid,data.gmnc,data,'c'));
+abs_g_vmec = abs(eval_series(volgrid,data.gmnc,data,'c'));
 
 % W = W_magnetic + W_pressure
 %W_magnetic = |B|^2 /2/mu0 , W_pressure = p / (gamma-1)
@@ -36,10 +36,10 @@ normed_magB = magB_sq./magB_axis;
 % W_B = trapz(v,trapz(u,trapz(s,magB.*g))) / 2/mu0
 if dimV >1
     W_B = trapz(v,trapz(u,trapz(s,magB_sq.*abs_g))) / 2/mu0
-    VMEC_W_B = trapz(vol_v,trapz(vol_u,trapz(vol_s,magB_vmec_sq.*g_vmec))) / 2/mu0
+    VMEC_W_B = trapz(vol_v,trapz(vol_u,trapz(vol_s,magB_vmec_sq.*abs_g_vmec))) / 2/mu0
 else
     W_B = trapz(u,trapz(s,magB_sq.*abs_g)) / 2/mu0 *2*pi
-    VMEC_W_B = trapz(vol_u,trapz(vol_s,magB_vmec_sq.*g_vmec)) / 2/mu0 *2*pi
+    VMEC_W_B = trapz(vol_u,trapz(vol_s,magB_vmec_sq.*abs_g_vmec)) / 2/mu0 *2*pi
 end
     % W_B_norm = trapz(u,trapz(s,normed_magB.*g)) / 2/mu0 *2*pi;
 % W_B = mean(W_B_norm,'all') 
@@ -61,7 +61,7 @@ for is=1:dimS-1
             else
                 dv = 2*pi;
             end
-            VMEC_WB_LHS = VMEC_WB_LHS + magB_vmec_sq(is,iu,iv) * abs(g_vmec(is,iu,iv))*ds*du*dv;
+            VMEC_WB_LHS = VMEC_WB_LHS + magB_vmec_sq(is,iu,iv) * abs(abs_g_vmec(is,iu,iv))*ds*du*dv;
         end
     end
 end
@@ -85,7 +85,7 @@ for is=2:dimS
                 dv = 2*pi;
                 iv = 1;
             end
-            VMEC_WB_RHS = VMEC_WB_RHS + magB_vmec_sq(is,iu,iv) * abs(g_vmec(is,iu,iv))*ds*du*dv;
+            VMEC_WB_RHS = VMEC_WB_RHS + magB_vmec_sq(is,iu,iv) * abs(abs_g_vmec(is,iu,iv))*ds*du*dv;
         end
     end
 end

@@ -12,8 +12,8 @@ data = read_vmec(file);
 
 % deriv_method='finite difference'; % finite difference or spline
 deriv_method='spline';
-numerical_covariant_B_derivs = false; % calculate cov_B derivs analytically or numerically
-numerical_contravariant_B_derivs = false; % calculate contra_B derivs analytically or numerically
+numerical_covariant_B_derivs = 1; % calculate cov_B derivs analytically or numerically
+numerical_contravariant_B_derivs = 1; % calculate contra_B derivs analytically or numerically
 interpolate = true; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
 
 %% constants
@@ -24,7 +24,7 @@ dimU = 100;
 if data.nfp > 1
     dimV = 20*data.nfp;
 else
-    dimV = 1;
+    dimV = 2;
 end
 %% Define the (s,u,v) 3D grid on which we are evaluating the force error
 s = linspace(0,1,dimS);
@@ -275,7 +275,7 @@ g_sv = dot(es,ev,4);
 
 g_us = dot(eu,es,4);
 g_uu = dot(eu,eu,4);
-g_uv = dot(eu,ev,4);
+g_uv = dot(eu,ev,4);%g_uv = g_vu
 
 g_vs = dot(ev,es,4);
 g_vu = dot(ev,eu,4);
@@ -300,7 +300,7 @@ if numerical_covariant_B_derivs
 
     Bv_s = real_space_deriv(Bv,s,deriv_method);
     Bv_u = real_space_deriv(Bv,u,deriv_method);
-%     plot_cov_B
+    plot_cov_B
 end
 
 

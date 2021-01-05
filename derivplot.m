@@ -32,7 +32,7 @@ title(sprintf('%s and %s versus %s',valname,derivname,wrtname))
 xlabel(wrtname)
 ylabel(derivname)
 legend(valname,derivname)
-set(gcf, 'Position',  [200, 200, 1000, 800])
+set(gcf, 'Position',  [200, 200, 900, 700])
 
 % fin dif to approx the deriv, use ismembertol to check that the fin dif is
 % similar to the calculated deriv

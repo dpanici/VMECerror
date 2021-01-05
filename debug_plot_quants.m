@@ -4,10 +4,10 @@
 
 close all
 
-u_index= 1; % index of u to plot quantities at
+u_index= 40; % index of u to plot quantities at
 v_nfp_index=1; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
-s_index=30; % index of s to plot quantities at (that arent plotted versus s)
+s_index=40; % index of s to plot quantities at (that arent plotted versus s)
 
 
 %% scatter plot for basis vector dot products
@@ -20,7 +20,7 @@ s_index=30; % index of s to plot quantities at (that arent plotted versus s)
 
 %% plot ||B||
 
-% run('plotting/compare_mag_B')
+run('plotting/compare_mag_B')
 
 %% Plot B^u
 
@@ -31,23 +31,21 @@ s_index=30; % index of s to plot quantities at (that arent plotted versus s)
 % run('plotting/compare_BV')
 
 %% Plot J^u, J^v (Units?)
-run('plotting/compare_J')
+% run('plotting/compare_J')
 
 %% Plot g
 
 % run('plotting/compare_g')
 
 %% Plot Lambda
-% 
-% figure()
-% plot(data.phi(s_index:end),L(s_index:end,1,v_nfp_index))
-% title(sprintf('L vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
-% xlabel('s')
-% ylabel('L')
+
+% run('plotting/compare_L')
 
 %% plot covariant B components 
 
-% run('plotting/compare_cov_B')
+% run('plotting/compare_cov_Bs')
+% run('plotting/compare_cov_Bu')
+% run('plotting/compare_cov_Bv')
 
 %% compare covariant B derivs I calculate here to ones I get with contravariant B
 
@@ -76,6 +74,7 @@ run('plotting/compare_J')
 
 
 %% try plotting my covariant J versus vmec
+% VMEC USES J^X * g, which is why I was off before
 % Ju = JS .* g_su + JU.*g_uu + JV .* g_vu;
 % Jv = JS .* g_sv + JU.*g_uv + JV .* g_vv;
 % 

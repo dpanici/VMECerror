@@ -124,7 +124,7 @@ figure()
 for i = 1:data.ns
     diff =abs(Bu_vmec(i,:,v_nfp_index)-Bu(i,:,v_nfp_index));
     if max(diff) > 0.01
-    plot(u,diff)
+    plot(u,diff,'DisplayName',sprintf('s=%f',data.phi(i)))
     hold on
     end
 end
@@ -132,7 +132,7 @@ end
 title(sprintf('diff in B_u and VMEC B_u vs u at various s for v = %f',v(v_nfp_index)))
 xlabel('u')
 ylabel('B_u')
-legend('My Calc','VMEC')
+legend
 
 
 
@@ -176,6 +176,20 @@ plot(u,Bv_vmec(s_index,:,v_nfp_index),'k--')
 xlabel('u')
 ylabel('B_v')
 legend('My Calc','VMEC')
+
+figure()
+for i = 1:data.ns
+    diff =abs(Bv_vmec(i,:,v_nfp_index)-Bv(i,:,v_nfp_index));
+    if max(diff) > 0.01
+    plot(u,diff,'DisplayName',sprintf('s=%f',data.phi(i)))
+    hold on
+    end
+end
+
+title(sprintf('diff in B_v and VMEC B_v vs u at various s for v = %f',v(v_nfp_index)))
+xlabel('u')
+ylabel('B_v')
+legend
 
 % vs v
 figure()
