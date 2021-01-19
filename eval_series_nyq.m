@@ -15,7 +15,7 @@ dimU = size(suvgrid,2);
 dimV = size(suvgrid,3);
 
 u = linspace(0,2*pi,dimU);
-v = linspace(0,2*pi,dimV);
+v = linspace(0,2*pi/data.nfp,dimV);
 [u,v] = ndgrid(u,v);
 
 is_sin = s_or_c=='s';
@@ -23,8 +23,10 @@ is_cos = s_or_c=='c';
 
 for is=1:dimS
     for i=1:length(data.xm_nyq)
-        sin_term = sin(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
-        cos_term = cos(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
+%         sin_term = sin(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
+%         cos_term = cos(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
+        sin_term = sin(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
+        cos_term = cos(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
         evaluated_value(is,:,:)= evaluated_value(is,:,:) ...
             + reshape(coeffs(i,is) .* (is_sin.*sin_term + is_cos.*cos_term),[1,dimU,dimV]);
     end

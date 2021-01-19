@@ -4,25 +4,25 @@ clearvars%, close all
 % file = 'VMECfiles/wout_HELIOTRON_16x4x4.nc';
 % file = 'VMECfiles/wout_HELIOTRON.nc';
 % file = 'VMECfiles/wout_DSHAPE_M20_Vac.nc';
-file = 'VMECfiles/wout_DSHAPE.nc';
-% file = 'VMECfiles/wout_HELIOTRON_Vac.nc';
+% file = 'VMECfiles/wout_DSHAPE.nc';
+file = 'VMECfiles/wout_HELIOTRON_Vac.nc';
 % file = 'VMECfiles/wout_SOLOVEV.nc';
-
+% file = 'VMECfiles/wout_W7X_standard.nc';
 data = read_vmec(file);
 
 % deriv_method='finite difference'; % finite difference or spline
 deriv_method='spline';
-numerical_covariant_B_derivs = 1; % calculate cov_B derivs analytically or numerically
-numerical_contravariant_B_derivs = 1; % calculate contra_B derivs analytically or numerically
-interpolate = true; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
-
+numerical_covariant_B_derivs = 0; % calculate cov_B derivs analytically or numerically
+numerical_contravariant_B_derivs = 0; % calculate contra_B derivs analytically or numerically
+interpolate = 0; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
+only_energy=0;
 %% constants
 mu0 = 4*pi * 1e-7;
 
 dimS = data.ns;
 dimU = 100;
 if data.nfp > 1
-    dimV = 20*data.nfp;
+    dimV = 10*data.nfp+1;
 else
     dimV = 2;
 end
@@ -43,7 +43,7 @@ end
 iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv(iota,data,deriv_method))',1,dimU,dimV); % radial deriv or rotational transform
 
-
+% data.phi = -data.phi
 Phi = -data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
 % chi, Phi are actually the normalized fluxes
 Phir = s_deriv(Phi,data,deriv_method);
@@ -207,6 +207,11 @@ BV = Phir .* (1 + L_u)./g;
 %define at magnetic axis 
 BV(1,:,:) = (Phir(1,:,:).* -L_su(1,:,:)) ./ gs(1,:,:); % L_su is NOT zero, we can define it (L_u is maybe zero tho)
 
+if only_energy
+    get_energy
+    return
+end
+
 %% partial derivatives of contravariant B components
 BU_s = - gs./g./g .* (chir - Phir.*L_v) + (chirr - Phir .* L_sv)./g;
 BU_u = - gu./g./g .* (chir - Phir.*L_v) + ( - Phir .* L_uv)./g;
@@ -282,7 +287,7 @@ g_vu = dot(ev,eu,4);
 g_vv = dot(ev,ev,4);
 
 Bs = BU.*g_us + BV .* g_vs;
-Bu = BU.*g_uu + BV .* g_vu;
+Bu = BU.*g_uu + BV .* g_vu;% check these two metric tensor terms
 Bv = BU.*g_uv + BV .* g_vv;
 
 %% numerical covariant B derivatives

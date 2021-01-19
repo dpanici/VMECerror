@@ -4,23 +4,28 @@
 
 close all
 
-u_index= 40; % index of u to plot quantities at
+u_index= 20; % index of u to plot quantities at
 v_nfp_index=1; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
-s_index=40; % index of s to plot quantities at (that arent plotted versus s)
+s_index=25; % index of s to plot quantities at (that arent plotted versus s)
 
 
 %% scatter plot for basis vector dot products
 
 % run('plotting/compare_basis_vec')
 
-%% surface plot check that my cov B and contrav B give same result for |B|
+%% Plot R derivs
+run('plotting/compare_R_s')
+% run('plotting/compare_Z_s')
+
+
+%% surface plot check thatZmy cov B and contrav B give same result for |B|
 
 % run('plotting/compare_mag_B_cov_contr')
 
 %% plot ||B||
 
-run('plotting/compare_mag_B')
+% run('plotting/compare_mag_B')
 
 %% Plot B^u
 
@@ -32,6 +37,12 @@ run('plotting/compare_mag_B')
 
 %% Plot J^u, J^v (Units?)
 % run('plotting/compare_J')
+
+%% Plot Cyl B
+
+% run('plotting/compare_BR')
+% run('plotting/compare_BPhi')
+% run('plotting/compare_BZ')
 
 %% Plot g
 
@@ -56,7 +67,7 @@ run('plotting/compare_mag_B')
 % derivplot(Bu,Bu_v,v)
 % 
 % derivplot(Bv,Bv_u,u)
-% derivplot(Bv,Bv_s,s)
+derivplot(Bv,Bv_s,s)
 
 
 %% plot current density

@@ -1,9 +1,16 @@
-% close all
+close all
 % Script for use after running force_error, so suvgrid and real-space
 % quantities are already defined
 
 % Check derivative values by plotting derivs and original quantities
-% together
+% together, with VMEC quantities
+
+if exist('R_v_vmec','var') == false   
+R_v_vmec =eval_series(suvgrid,data.rvmns,data,'s');
+end
+if exist('Z_v_vmec','var') == false   
+Z_v_vmec =eval_series(suvgrid,data.zvmnc,data,'c');
+end
 
 % check iota, iotar and chi, chir - Good
 % figure()
@@ -21,12 +28,16 @@
 % legend('chi','chi_s','-iota.*Phir')
 
 %% Angular Derivs - All good after realizing sign error in v derivs
-% derivplot(R,R_u,u) % good
-% derivplot(Z,Z_u,u) % good
-% derivplot(R,R_v,v) % good
-% derivplot(Z,Z_v,v) % good
+derivplot(R,R_u,u)% good
+derivplot(Z,Z_u,u) % good
+derivplot(R,R_v,v) % good
+hold on
+plot(v,reshape(R_v_vmec(5,5,:),size(v)),'k--')
+derivplot(Z,Z_v,v) % good
+hold on
+plot(v,reshape(Z_v_vmec(5,5,:),size(v)),'k--')
 % derivplot(L,L_u,u) % good % Matches VMECplot
-derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
+% derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 %  
 % derivplot(R_u,R_uu,u) % good
 % derivplot(Z_u,Z_uu,u) % good
@@ -59,7 +70,7 @@ derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 % derivplot(BU,BU_u,u)  % good
 % derivplot(BU,BU_v,v)
 
-derivplot(BV,BV_s,s)
+% derivplot(BV,BV_s,s)
 % derivplot(BV,BV_u,u)
 % derivplot(BV,BV_v,v)
 

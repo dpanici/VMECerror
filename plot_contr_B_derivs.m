@@ -1,4 +1,4 @@
-% close all
+close all
 s_index = 30
 u_index = 1
 v_nfp_index = 1

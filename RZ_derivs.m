@@ -2,7 +2,7 @@
 
 % d = read_vmec('wout_HELIOTRON_16x4x4.nc');
 d = data;
-xn = -d.xn;
+xn = d.xn;
 xm = d.xm;
 
 % matlabvmec uses (mu+nv) convention, so my fourer coeffs involving v derivs
@@ -40,15 +40,15 @@ xm = d.xm;
 % matlabVMEC's xn is actually xn*nfp, so do not need to use nfp in doing these derivatives 
 
 %% Angular Derivatives functional forms
-% R_u = -rmnc * m * sin(m*u - n*v*nfp)
+% R_u = -rmnc * m * sin(m*u + n*v*nfp)
 rumns = -d.rmnc .* xm'; % 2D array of the coeffs of the sine terms that are the deriv of R wrt u, first index gives fourier coeff, second gives s index
 
 assert(isequal(rumns, d.rumns)) % check against VMEC output  which also calculates rumns
 
 % R_v =  rmnc * n*nfp*sin(m*u - n*v*nfp)
-rvmns = d.rmnc .* xn';%.* d.nfp;
+rvmns = -d.rmnc .* xn';%.* d.nfp;
 
-assert(isequal(rvmns, d.rvmns)) % must assert the - of ours is equal bc matlabvmec uses (mu-nvnfp)
+assert(isequal(rvmns, d.rvmns)) 
 
 % R_uu = -rmnc * m^2 * cos(m*u - n*v*nfp)
 ruumnc = -d.rmnc .* (xm.^2)';
@@ -57,7 +57,7 @@ ruumnc = -d.rmnc .* (xm.^2)';
 rvvmnc = -d.rmnc .* (xn.^2)';
 
 % R_uv = rmnc * m * n * nfp * cos(m*u - n*v*nfp)
-ruvmnc = d.rmnc .*xm' .* xn';
+ruvmnc = -d.rmnc .*xm' .* xn';
 
 % Z_u = zmns * m * cos(m*u - n*v*nfp)
 zumnc = d.zmns .* xm';
@@ -65,7 +65,7 @@ zumnc = d.zmns .* xm';
 assert(isequal(zumnc,d.zumnc))
 
 % Z_v = -zmns * n * nfp * cos(m*u - n*v*nfp)
-zvmnc = -d.zmns .* xn';
+zvmnc = d.zmns .* xn';
 
 assert(isequal(zvmnc,d.zvmnc))
 
@@ -76,7 +76,7 @@ zuumns = -d.zmns .* (xm.^2)';
 zvvmns = - d.zmns .* (xn.^2)';
 
 % Z_uv = zmns * m * n * nfp * sin(m*u - n*v*nfp)
-zuvmns = d.zmns .* xm' .* xn';
+zuvmns = -d.zmns .* xm' .* xn';
 
 % Convert lambda from the half-mesh onto the full mesh
 %  just linear interpolation onto the full mesh from the half-mesh
@@ -89,7 +89,7 @@ lmns(:,end) = 2 * d.lmns(end) - d.lmns(d.ns-2);
 lumnc = d.lmns .* xm';
 
 % L_v = -lmns * n * nfp * cos(m*u - n*v*nfp)
-lvmnc = -d.lmns .* xn';
+lvmnc = d.lmns .* xn';
 
 % L_uu = -lmns * m^2 * sin(m*u - n*v*nfp)
 luumns = -d.lmns .* (xm.^2)';
@@ -98,7 +98,7 @@ luumns = -d.lmns .* (xm.^2)';
 lvvmns = - d.lmns .* (xn.^2)';
 
 % L_uv = lmns * m * n * nfp * sin(m*u - n*v*nfp)
-luvmns = d.lmns .* xm' .* xn'; % for some reason sign is flipped or something here
+luvmns = -d.lmns .* xm' .* xn';
 
 %% Numerical first radial derivatives
 rsmnc = s_deriv(d.rmnc,d,deriv_method); %R_s

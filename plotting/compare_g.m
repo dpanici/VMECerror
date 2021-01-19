@@ -79,6 +79,19 @@ title(sprintf('Difference in my g and VMEC g at v = %f',v(v_nfp_index)))
 xlabel('R')
 ylabel('Z')
 axis equal
+
+figure()
+contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),g(:,:,nfp_v_index),10)
+colormap jet
+% caxis([0,0.01])
+colorbar;
+title(sprintf('Difference in my g and VMEC g at v = %f',v(v_nfp_index)))
+xlabel('R')
+ylabel('Z')
+axis equal
+
+
+
 % s,u
 figure()
 pcolor(u,s,abs(g(:,:,nfp_v_index) - g_vmec(:,:,nfp_v_index)))

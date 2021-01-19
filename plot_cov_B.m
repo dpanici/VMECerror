@@ -1,4 +1,4 @@
-% close all
+close all
 s_index = 30
 u_index = 1
 v_nfp_index = 1
@@ -29,7 +29,9 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(data.phi(s_index:end),Bu_vmec(s_index:end,u_index,v_nfp_index),'k')
-legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_u')
+hold on
+plot(data.phi(s_index:end),Bu(s_index:end,u_index,v_nfp_index),'r--')
+legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_u','My B_u')
 
 figure()
 plot(data.phi(s_index:end),Bv_sa(s_index:end,u_index,v_nfp_index))
@@ -45,6 +47,7 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(data.phi(s_index:end),Bv_vmec(s_index:end,u_index,v_nfp_index),'k')
+hold on
 plot(data.phi(s_index:end),Bv(s_index:end,u_index,v_nfp_index),'r--')
 legend('Analytic deriv', 'Numerical deriv','Zero', 'VMEC B_v','My Bv')
 
@@ -64,7 +67,9 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(u,Bs_vmec(s_index,:,v_nfp_index),'k')
-legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_s')
+hold on
+plot(u,Bs(s_index,:,v_nfp_index),'r--')
+legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_s', 'My B_s')
 
 figure()
 
@@ -81,6 +86,7 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(u,Bv_vmec(s_index,:,v_nfp_index),'k')
+hold on
 plot(u,Bv(s_index,:,v_nfp_index),'r--')
 legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_v','My Bv')
 
@@ -100,7 +106,9 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(v,reshape(Bs_vmec(s_index,u_index,:),size(v)),'k')
-legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_s')
+hold on
+plot(v,reshape(Bs(s_index,u_index,:),size(v)),'r--')
+legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_s', 'My B_s')
 
 figure()
 
@@ -117,5 +125,7 @@ hold on
 yyaxis right
 ylabel('Value')
 plot(v,reshape(Bu_vmec(s_index,u_index,:),size(v)),'k')
-legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_u')
+hold on
+plot(v,reshape(Bu(s_index,u_index,:),size(v)),'r--')
+legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_u', 'My B_u')
 

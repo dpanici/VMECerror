@@ -20,7 +20,7 @@ axis equal
 title(sprintf('Flux Surfaces at nfp*phi=%f',v(nfp_v_index)))
 
 %should I divide by (presr * gss) or just presr? 
-for nfp_v_index=1:1
+for nfp_v_index=1:19:dimV
 figure()
 % contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(F(:,:,nfp_v_index) ./ abs(presr(floor(data.ns/4),:,nfp_v_index) .* sqrt(gss(floor(data.ns/4),:,nfp_v_index)))))
 contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(F(:,:,nfp_v_index)))
