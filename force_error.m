@@ -5,9 +5,10 @@ clearvars%, close all
 % file = 'VMECfiles/wout_HELIOTRON.nc';
 % file = 'VMECfiles/wout_DSHAPE_M20_Vac.nc';
 % file = 'VMECfiles/wout_DSHAPE.nc';
-file = 'VMECfiles/wout_HELIOTRON_Vac.nc';
+% file = 'VMECfiles/wout_HELIOTRON_Vac.nc';
+
 % file = 'VMECfiles/wout_SOLOVEV.nc';
-% file = 'VMECfiles/wout_W7X_standard.nc';
+file = 'VMECfiles/wout_W7X_standard.nc';
 data = read_vmec(file);
 
 % deriv_method='finite difference'; % finite difference or spline
@@ -16,6 +17,7 @@ numerical_covariant_B_derivs = 0; % calculate cov_B derivs analytically or numer
 numerical_contravariant_B_derivs = 0; % calculate contra_B derivs analytically or numerically
 interpolate = 0; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
 only_energy=0;
+
 %% constants
 mu0 = 4*pi * 1e-7;
 
