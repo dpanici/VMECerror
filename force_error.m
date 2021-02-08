@@ -1,18 +1,21 @@
 % Calculate Force error
-clearvars%, close all
+clearvars, close all
 % file = 'VMECfiles/wout_HELIOTRON_32x8x8.nc';
 % file = 'VMECfiles/wout_HELIOTRON_16x4x4.nc';
 % file = 'VMECfiles/wout_HELIOTRON.nc';
+% file = 'VMECfiles/wout_HELIOTRON_s256_M3_N1.nc';
 % file = 'VMECfiles/wout_DSHAPE_M20_Vac.nc';
-% file = 'VMECfiles/wout_DSHAPE.nc';
+file = 'VMECfiles/wout_DSHAPE.nc';
 % file = 'VMECfiles/wout_HELIOTRON_Vac.nc';
 
 % file = 'VMECfiles/wout_SOLOVEV.nc';
-file = 'VMECfiles/wout_W7X_standard.nc';
+% file = 'VMECfiles/wout_W7X_standard.nc';
 data = read_vmec(file);
 
-% deriv_method='finite difference'; % finite difference or spline
+% deriv_method='finite difference'; % finite difference or spline or pchip
 deriv_method='spline';
+% deriv_method = 'pchip';
+% deriv_method = 'makima';
 numerical_covariant_B_derivs = 0; % calculate cov_B derivs analytically or numerically
 numerical_contravariant_B_derivs = 0; % calculate contra_B derivs analytically or numerically
 interpolate = 0; % whether or not to interpolate R,L,Z onto a finer grid before calculating force
@@ -22,14 +25,19 @@ only_energy=0;
 mu0 = 4*pi * 1e-7;
 
 dimS = data.ns;
-dimU = 100;
+dimU = 40;
 if data.nfp > 1
-    dimV = 10*data.nfp+1;
+    dimV = 5*data.nfp;
 else
     dimV = 2;
 end
 %% Define the (s,u,v) 3D grid on which we are evaluating the force error
-s = linspace(0,1,dimS);
+% s = linspace(0,1,dimS);
+%%% THIS IS WHAT WAS CHANGED RECENTLY
+Phi = -data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
+% chi, Phi are actually the normalized fluxes
+data.phi = data.phi/ data.phi(end); 
+s = data.phi ;
 u = linspace(0,2*pi,dimU);
 v = linspace(0,2*pi,dimV);
 
@@ -45,9 +53,8 @@ end
 iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv(iota,data,deriv_method))',1,dimU,dimV); % radial deriv or rotational transform
 
-% data.phi = -data.phi
-Phi = -data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
-% chi, Phi are actually the normalized fluxes
+
+
 Phir = s_deriv(Phi,data,deriv_method);
 chi = data.chi./2./pi; % poloidal flux
 chir = repmat((iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
@@ -290,13 +297,15 @@ g_vv = dot(ev,ev,4);
 
 Bs = BU.*g_us + BV .* g_vs;
 Bu = BU.*g_uu + BV .* g_vu;% check these two metric tensor terms
+% Bu = BU.*g_uu + BV .* (R_v.*R_u + Z_v.* Z_u);% check these two metric tensor terms
 Bv = BU.*g_uv + BV .* g_vv;
 
 %% numerical covariant B derivatives
 
 % Bs = eval_series_nyq(suvgrid,data.bsubsmns,data,'s');
-% Bu = eval_series_nyq(suvgrid,data.bsubumnc,data,'c');
+% Bu = eval_series_nyq(suvgrid,data.bsubumnc,data,'c'); % just trying to use VMEC Bu for hell of it
 % Bv = eval_series_nyq(suvgrid,data.bsubvmnc,data,'c');
+% Bu_s = real_space_deriv(Bu,s,deriv_method);
 
 if numerical_covariant_B_derivs
     Bs_u = real_space_deriv(Bs,u,deriv_method);

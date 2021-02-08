@@ -83,3 +83,69 @@ ylabel('Z (m)')
 axis equal
 title(sprintf('||B|| from VMEC contr B at nfp*phi=%f',v(v_nfp_index)))
 
+
+quant = magB_cov;
+quant_str = '|B| from covB';
+quant_vmec = magB_cov_vmec;
+
+% s,u
+figure()
+pcolor(u,s,abs(quant(:,:,nfp_v_index) - quant_vmec(:,:,nfp_v_index)))
+colormap jet
+caxis([0,0.01])
+colorbar
+xlabel('u')
+ylabel('s')
+title(sprintf('Abs Difference in my %s and VMEC at v = %f',quant_str,v(v_nfp_index)))
+%s,v
+figure()
+pcolor(v,s,reshape(abs(quant(:,u_index,:) - quant_vmec(:,u_index,:)),[dimS,dimV]))
+colormap jet
+caxis([0,0.01])
+colorbar
+xlabel('v')
+ylabel('s')
+title(sprintf('Abs Difference in my %s and VMEC at u = %f',quant_str,u(u_index)))
+
+%u,v
+figure()
+pcolor(v,u,reshape(abs(quant(s_index,:,:) - quant_vmec(s_index,:,:)),[dimU,dimV]))
+colormap jet
+caxis([0,0.01])
+colorbar
+xlabel('v')
+ylabel('u')
+title(sprintf('Abs Difference in my %s and VMEC at s = %f',quant_str,data.phi(s_index)))
+
+%% ratios 
+
+clims_ratio = [0,0.25];
+%s,u 
+figure()
+pcolor(u,s,abs((quant(:,:,nfp_v_index) - quant_vmec(:,:,nfp_v_index)) ./ quant_vmec(:,:,nfp_v_index)))
+colormap jet
+caxis(clims_ratio)
+colorbar
+xlabel('u')
+ylabel('s')
+title(sprintf(' Abs Pct Difference in my %s and VMEC at v = %f',quant_str,v(v_nfp_index)))
+%s,v
+figure()
+pcolor(v,s,reshape(abs((quant(:,u_index,:) - quant_vmec(:,u_index,:)) ./ quant_vmec(:,u_index,:)),[dimS,dimV]))
+colormap jet
+caxis(clims_ratio)
+colorbar
+xlabel('v')
+ylabel('s')
+title(sprintf('Abs pct Difference in my %s and VMEC at u = %f',quant_str,u(u_index)))
+
+%u,v
+figure()
+pcolor(v,u,reshape(abs((quant(s_index,:,:) - quant_vmec(s_index,:,:)) ./ quant_vmec(s_index,:,:)),[dimU,dimV]))
+colormap jet
+caxis(clims_ratio)
+colorbar
+xlabel('v')
+ylabel('u')
+title(sprintf('Abs Pct Difference in my %s and VMEC at s = %f',quant_str,data.phi(s_index)))
+

@@ -4,10 +4,10 @@
 
 close all
 
-u_index= 20; % index of u to plot quantities at
+u_index= 5; % index of u to plot quantities at
 v_nfp_index=1; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
-s_index=25; % index of s to plot quantities at (that arent plotted versus s)
+s_index=15; % index of s to plot quantities at (that arent plotted versus s)
 
 
 %% scatter plot for basis vector dot products
@@ -15,7 +15,7 @@ s_index=25; % index of s to plot quantities at (that arent plotted versus s)
 % run('plotting/compare_basis_vec')
 
 %% Plot R derivs
-run('plotting/compare_R_s')
+% run('plotting/compare_R_s')
 % run('plotting/compare_Z_s')
 
 
@@ -37,7 +37,7 @@ run('plotting/compare_R_s')
 
 %% Plot J^u, J^v (Units?)
 % run('plotting/compare_J')
-
+% 
 %% Plot Cyl B
 
 % run('plotting/compare_BR')
@@ -55,8 +55,11 @@ run('plotting/compare_R_s')
 %% plot covariant B components 
 
 % run('plotting/compare_cov_Bs')
-% run('plotting/compare_cov_Bu')
+run('plotting/compare_cov_Bu')
 % run('plotting/compare_cov_Bv')
+
+%% plot metric tensor
+% run('plotting/plot_metric_tensor')
 
 %% compare covariant B derivs I calculate here to ones I get with contravariant B
 
@@ -67,7 +70,7 @@ run('plotting/compare_R_s')
 % derivplot(Bu,Bu_v,v)
 % 
 % derivplot(Bv,Bv_u,u)
-derivplot(Bv,Bv_s,s)
+% derivplot(Bv,Bv_s,s)
 
 
 %% plot current density

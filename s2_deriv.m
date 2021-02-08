@@ -17,5 +17,17 @@ elseif strcmp(deriv_method,'spline')
     spline_fit = spline(data.phi,fourier_coeffs);
     spline_deriv_2 = fnder(spline_fit,2);
     value_s2_deriv = ppval(spline_deriv_2,data.phi);
+
+elseif strcmp(deriv_method,'pchip')
+    fit = pchip(data.phi,fourier_coeffs);
+    deriv_2 = fnder(fit,2);
+    value_s2_deriv = ppval(deriv_2,data.phi);
+elseif strcmp(deriv_method,'makima')
+    fit = makima(data.phi,fourier_coeffs);
+    deriv_2 = fnder(fit,2);
+    value_s2_deriv = ppval(deriv_2,data.phi);
+
 end
+
+
 end

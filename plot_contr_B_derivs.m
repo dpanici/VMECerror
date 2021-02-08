@@ -1,7 +1,8 @@
 close all
-s_index = 30
-u_index = 1
-v_nfp_index = 1
+u_index= 7; % index of u to plot quantities at
+v_nfp_index=75; % index of v to plot quantities at
+nfp_v_index = v_nfp_index;
+s_index=50; % index of s to plot quantities at (that arent plotted versus s)
 
 if exist('BU_vmec','var')== false
 BU_vmec = eval_series_nyq(suvgrid,data.bsupumnc,data,'c');

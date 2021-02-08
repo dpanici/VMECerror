@@ -45,7 +45,7 @@ rumns = -d.rmnc .* xm'; % 2D array of the coeffs of the sine terms that are the 
 
 assert(isequal(rumns, d.rumns)) % check against VMEC output  which also calculates rumns
 
-% R_v =  rmnc * n*nfp*sin(m*u - n*v*nfp)
+% R_v =  -rmnc * n*nfp*sin(m*u + n*v*nfp)
 rvmns = -d.rmnc .* xn';%.* d.nfp;
 
 assert(isequal(rvmns, d.rvmns)) 
@@ -85,10 +85,10 @@ lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2); % should be axis limit for lambda
 lmns(:,2:d.ns) = 0.5 * (d.lmns(:,1:d.ns-1) + d.lmns(:,2:d.ns));
 lmns(:,end) = 2 * d.lmns(end) - d.lmns(d.ns-2);
 
-%L_u = lmns * m * cos(m*u-n*v*nfp)
+%L_u = lmns * m * cos(m*u+n*v*nfp)
 lumnc = d.lmns .* xm';
 
-% L_v = -lmns * n * nfp * cos(m*u - n*v*nfp)
+% L_v = lmns * n * nfp * cos(m*u + n*v*nfp)
 lvmnc = d.lmns .* xn';
 
 % L_uu = -lmns * m^2 * sin(m*u - n*v*nfp)
