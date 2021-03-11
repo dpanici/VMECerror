@@ -5,6 +5,10 @@ close all
 % Check derivative values by plotting derivs and original quantities
 % together, with VMEC quantities
 
+sindex=10;
+uindex=6;
+vindex=1;
+
 if exist('R_v_vmec','var') == false   
 R_v_vmec =eval_series(suvgrid,data.rvmns,data,'s');
 end
@@ -32,10 +36,10 @@ derivplot(R,R_u,u)% good
 derivplot(Z,Z_u,u) % good
 derivplot(R,R_v,v) % good
 hold on
-plot(v,reshape(R_v_vmec(5,5,:),size(v)),'k--')
+plot(v,reshape(R_v_vmec(s_index,u_index,:),size(v)),'k--')
 derivplot(Z,Z_v,v) % good
 hold on
-plot(v,reshape(Z_v_vmec(5,5,:),size(v)),'k--')
+plot(v,reshape(Z_v_vmec(s_index,u_index,:),size(v)),'k--')
 % derivplot(L,L_u,u) % good % Matches VMECplot
 % derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 %  

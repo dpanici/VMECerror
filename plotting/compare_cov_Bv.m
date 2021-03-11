@@ -104,7 +104,7 @@ title(sprintf('Abs Difference in my %s and VMEC at s = %f',quant_str,data.phi(s_
 
 %% ratios 
 
-clims_ratio = [0,0.25];
+clims_ratio = [0,0.1];
 %s,u 
 figure()
 pcolor(u,s,abs((quant(:,:,nfp_v_index) - quant_vmec(:,:,nfp_v_index)) ./ quant_vmec(:,:,nfp_v_index)))

@@ -12,7 +12,6 @@ plot(data.phi(s_index:end),quant(s_index:end,u_index,v_nfp_index))
 title(sprintf('%s vs s at u=%f, nfp*phi=%f',quant_str,u(u_index),v(v_nfp_index)))
 
 
-
 hold on
 plot(data.phi(s_index:end),quant_vmec(s_index:end,u_index,v_nfp_index))
 xlabel('s')

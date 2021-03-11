@@ -22,7 +22,7 @@ title(sprintf('sqrt(g)*J^u VMEC vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_ind
 xlabel('s')
 ylabel('sqrt(g)*J^u')
 legend('My Calc','VMEC')
-
+ylim([min(JU_vmec(s_index:end,u_index,v_nfp_index)),max(JU_vmec(s_index:end,u_index,v_nfp_index))]);
 % plot J
 figure()
 
@@ -34,10 +34,10 @@ hold on
 plot(data.phi(s_index:end),JU_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index))
 % title(sprintf('J^u VMEC vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 xlabel('s')
-ylabel('sqrt(g)*J^u')
+ylabel('J^u')
 legend('My Calc','VMEC')
-
-
+ylim([min(JU_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index)),max(JU_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index))]);
+% ylim([-1.5e4,3e5])
 
 % plot J * g
 figure()
@@ -49,6 +49,7 @@ ylabel('sqrt(g)*J^v')
 hold on
 plot(data.phi(s_index:end),JV_vmec(s_index:end,u_index,v_nfp_index))
 legend('mine','VMEC')
+ylim([min(JV_vmec(s_index:end,u_index,v_nfp_index)),max(JV_vmec(s_index:end,u_index,v_nfp_index))]);
 
 %plot J
 figure()
@@ -60,6 +61,9 @@ ylabel('J^v')
 hold on
 plot(data.phi(s_index:end),JV_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index))
 legend('mine','VMEC')
+ylim([min(JV_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index)),max(JV_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index))]);
+% ylim([2.45e4,3.5e4])
+
 
 %% 2D
 clims = [0,1e4];

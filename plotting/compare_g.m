@@ -6,13 +6,13 @@ end
 % vs s
 figure()
 
-plot(data.phi(10:end),g(10:end,u_index,v_nfp_index))
+plot(data.phi(s_index:end),g(s_index:end,u_index,v_nfp_index))
 title(sprintf('g vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 xlabel('s')
 ylabel('g')
 
 hold on
-plot(data.phi(10:end),g_vmec(10:end,u_index,v_nfp_index))
+plot(data.phi(s_index:end),g_vmec(s_index:end,u_index,v_nfp_index))
 title(sprintf('g vmec vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 xlabel('s')
 ylabel('g')

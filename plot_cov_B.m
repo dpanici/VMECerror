@@ -1,8 +1,8 @@
 close all
-u_index= 7; % index of u to plot quantities at
-v_nfp_index=75; % index of v to plot quantities at
+u_index= 80; % index of u to plot quantities at
+v_nfp_index=1; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
-s_index=50; % index of s to plot quantities at (that arent plotted versus s)
+s_index=10; % i
 if exist('Bs_vmec','var')== false
 Bs_vmec = eval_series_nyq(suvgrid,data.bsubsmns,data,'s');
 end
@@ -23,16 +23,16 @@ ylabel('Deriv')
 xlabel('s')
 
 hold on
-plot(data.phi(s_index:end),Bu_s(s_index:end,u_index,v_nfp_index))
+plot(data.phi(s_index:end),Bu_s(s_index:end,u_index,v_nfp_index),'g--')
 hold on
-yline(0,'--')
-hold on
+% yline(0,'--')
+% hold on
 yyaxis right
 ylabel('Value')
 plot(data.phi(s_index:end),Bu_vmec(s_index:end,u_index,v_nfp_index),'k')
 hold on
 plot(data.phi(s_index:end),Bu(s_index:end,u_index,v_nfp_index),'r--')
-legend('Analytic deriv','Numerical deriv','Zero', 'VMEC B_u','My B_u')
+legend('Analytic deriv','Numerical deriv', 'VMEC B_u','My B_u')
 
 figure()
 plot(data.phi(s_index:end),Bv_sa(s_index:end,u_index,v_nfp_index))

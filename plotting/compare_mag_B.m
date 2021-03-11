@@ -5,7 +5,10 @@ end
 if exist('magB','var') == false   
 magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4));% + (BU.*BV).*dot(eu,ev,4) + (BU.*BV).*dot(ev,eu,4));
 end
-
+if exist('magB_mixed','var') == false
+% magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4))    
+magB_mixed = sqrt((BU.*Bu) + (BV.*Bv));
+end
 figure()
 contourf(R(:,:,v_nfp_index),Z(:,:,v_nfp_index),magB(:,:,v_nfp_index))
 % caxis([0.15 0.3])
@@ -20,7 +23,7 @@ title(sprintf('||B|| I calculate at nfp*phi=%f',v(v_nfp_index)))
 figure()
 
 plot(u,magB(s_index,:,v_nfp_index))
-title(sprintf('||B|| vs u at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
+title(sprintf('||B|| vs u at s=%f, nfp*phi=%f',s(s_index),v(v_nfp_index)))
 xlabel('u')
 ylabel('||B||')
 % ylim([0,1.1*max(magB(s_index,:,v_nfp_index))])
@@ -43,9 +46,13 @@ ylim([0,1.1*max(magB(:,u_index,v_nfp_index))])
 
 hold on
 plot(data.phi,magB_vmec(:,u_index,v_nfp_index),'--')
+hold on
+plot(data.phi,magB_mixed(:,u_index,v_nfp_index))
+
+
 %title(sprintf('||B|| vmec vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 
-legend('My Calc','VMEC')
+legend('My Calc','VMEC','My B^i * B_i')
 
 % vs v
 figure()

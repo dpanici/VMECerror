@@ -13,7 +13,6 @@ if exist('magB_cov','var') == false
 magB_cov = sqrt((Bs.^2).*dot(eS,eS,4) + (Bu.^2).*dot(eU,eU,4) + (Bv.^2).*dot(eV,eV,4));
 end
 if exist('magB','var') == false
-    %CHANGED HERE, INTERESTING
 % magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4))    
 magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4) + (BU.*BV).*dot(eu,ev,4) + (BU.*BV).*dot(ev,eu,4));
 end
