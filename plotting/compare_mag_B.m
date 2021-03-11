@@ -3,7 +3,7 @@ if exist('magB_vmec','var') == false
 magB_vmec = eval_series_nyq(suvgrid,data.bmnc,data,'c');
 end
 if exist('magB','var') == false   
-magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4));% + (BU.*BV).*dot(eu,ev,4) + (BU.*BV).*dot(ev,eu,4));
+magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4) + (BU.*BV).*dot(eu,ev,4) + (BU.*BV).*dot(ev,eu,4));
 end
 if exist('magB_mixed','var') == false
 % magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4))    
@@ -47,7 +47,7 @@ ylim([0,1.1*max(magB(:,u_index,v_nfp_index))])
 hold on
 plot(data.phi,magB_vmec(:,u_index,v_nfp_index),'--')
 hold on
-plot(data.phi,magB_mixed(:,u_index,v_nfp_index))
+plot(data.phi,magB_mixed(:,u_index,v_nfp_index),'--')
 
 
 %title(sprintf('||B|| vmec vs s at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))

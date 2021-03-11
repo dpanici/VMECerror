@@ -11,7 +11,7 @@ abs_g_vmec = abs(eval_series(suvgrid,data.gmnc,data,'c'));
 % W_magnetic = |B|^2 /2/mu0 , W_pressure = p / (gamma-1)
 gamma=data.gamma;
 presf = repmat(data.presf',1,dimU,dimV);
-magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4));
+magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4) + (BU.*BV).*dot(eu,ev,4) + (BU.*BV).*dot(ev,eu,4));
 % magB = sqrt((BU.^2).*dot(eu,eu,4) + (BV.^2).*dot(ev,ev,4) + (BU.*BV).*dot(eu,ev,4) + (BU.*BV).*dot(ev,eu,4));
 magB_sq = magB.^2;
 
