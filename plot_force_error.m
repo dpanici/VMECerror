@@ -51,7 +51,7 @@ if max(data.presf) > 1e-3
     c=colorbar; 
     caxis([-3 1.5]);
     hold on
-    plot(R(i_s,:,nfp_v_index),Z(i_s,:,nfp_v_index),'r')
+    plot(R(8,:,nfp_v_index),Z(8,:,nfp_v_index),'r')
     xlabel('R (m)')
     ylabel('Z (m)')
     axis equal
@@ -66,12 +66,12 @@ else % vacuum case, use ratio of gradient of magnetic pressure to magnetic field
 %                     2 .* (BU.*BU_u + BV.*BU_v).*(BU.*BV_u + BV.*BV_v) .*dot(eu,ev,4) ) ;
     
 
-    grad_B_pres_S = (BU.*Bu_s + Bu.*BU_s + Bv.*BV_s + BV.*Bv_s)*0.5; % contravariant s component of the magnetic pressure gradient
-    grad_B_pres_U = (BU.*Bu_u + Bu.*BU_u + Bv.*BV_u + BV.*Bv_u).*0.5; % contravariant u component of the magnetic pressure gradient
-    grad_B_pres_V = (BU.*Bu_v + Bu.*BU_v + Bv.*BV_v + BV.*Bv_v).*0.5; % contravariant v component of the magnetic pressure gradient
-    grad_B_pres = (grad_B_pres_S .* es + grad_B_pres_U .* eu + grad_B_pres_V .* ev);
+    grad_B_pres_s = (BU.*Bu_s + Bu.*BU_s + Bv.*BV_s + BV.*Bv_s)*0.5; % contravariant s component of the magnetic pressure gradient
+    grad_B_pres_u = (BU.*Bu_u + Bu.*BU_u + Bv.*BV_u + BV.*Bv_u).*0.5; % contravariant u component of the magnetic pressure gradient
+    grad_B_pres_v = (BU.*Bu_v + Bu.*BU_v + Bv.*BV_v + BV.*Bv_v).*0.5; % contravariant v component of the magnetic pressure gradient
+    grad_B_pres = (grad_B_pres_s .* eS + grad_B_pres_u .* eU + grad_B_pres_v .* eV);
 
-    mag_grad_B_pres = sqrt((grad_B_pres_S .* dot(grad_B_pres,es,4) + grad_B_pres_U .* dot(grad_B_pres,eu,4) + grad_B_pres_V .* dot(grad_B_pres,ev,4) ) );
+    mag_grad_B_pres = sqrt((grad_B_pres_s .* dot(grad_B_pres,eS,4) + grad_B_pres_u .* dot(grad_B_pres,eU,4) + grad_B_pres_v .* dot(grad_B_pres,eV,4) ) );
 
 %     vac_F = (grad_B_pres - B_tension)./mu0;
 % magnitude of vac_F is mag(grad_B_pres) + mag(B_tension) - 2 * B_pressure

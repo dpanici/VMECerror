@@ -7,7 +7,7 @@ close all
 u_index= 9; % index of u to plot quantities at
 v_nfp_index=1; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
-s_index=1; % index of s to plot quantities at (that arent plotted versus s)
+s_index=10; % index of s to plot quantities at (that arent plotted versus s)
 
 
 %% R,Z derivs
@@ -30,6 +30,9 @@ s_index=1; % index of s to plot quantities at (that arent plotted versus s)
 
 % run('plotting/compare_mag_B')
 
+%% Plot B^2 derivatives
+run('plotting/check_grad_Bsq')
+
 %% Plot B^u
 
 % run('plotting/compare_BU')
@@ -39,7 +42,7 @@ s_index=1; % index of s to plot quantities at (that arent plotted versus s)
 % run('plotting/compare_BV')
 
 %% Plot J^u, J^v (Units?)
-run('plotting/compare_J')
+% run('plotting/compare_J')
 % 
 %% Plot Cyl B
 
