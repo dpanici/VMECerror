@@ -16,20 +16,34 @@ dimV = size(suvgrid,3);
 
 u = linspace(0,2*pi,dimU);
 v = linspace(0,2*pi/data.nfp,dimV);
-[u,v] = ndgrid(u,v);
+% [u,v] = ndgrid(u,v);
 
 is_sin = s_or_c=='s';
 is_cos = s_or_c=='c';
 
+% mode angle arrays
+mu = data.xm_nyq'*u;
+nv = data.xn_nyq'*v;
+% evaluated trig fxn arrays
+cosmu = cos(mu);
+sinmu = sin(mu);
+cosnv = cos(nv);
+sinnv = sin(nv);
+
+
 for is=1:dimS
-    for i=1:length(data.xm_nyq)
-%         sin_term = sin(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
-%         cos_term = cos(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
-        sin_term = sin(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
-        cos_term = cos(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
-        evaluated_value(is,:,:)= evaluated_value(is,:,:) ...
-            + reshape(coeffs(i,is) .* (is_sin.*sin_term + is_cos.*cos_term),[1,dimU,dimV]);
-    end
+    coeffs_rep = repmat(coeffs(:,is),[1 dimU]); % replicate the fourier coeffs at this flux surface across the values of u
+    sin_term = (coeffs_rep.*sinmu)'*cosnv + (coeffs_rep.*cosmu)'*sinnv;
+    cos_term = (coeffs_rep.*cosmu)'*cosnv - (coeffs_rep.*sinmu)'*sinnv;
+    evaluated_value(is,:,:)= is_sin.*sin_term + is_cos.*cos_term;
+%     for i=1:length(data.xm_nyq)
+% %         sin_term = sin(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
+% %         cos_term = cos(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
+%         sin_term = sin(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
+%         cos_term = cos(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
+%         evaluated_value(is,:,:)= evaluated_value(is,:,:) ...
+%             + reshape(coeffs(i,is) .* (is_sin.*sin_term + is_cos.*cos_term),[1,dimU,dimV]);
+%     end
 end
 
 end

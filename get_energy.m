@@ -5,7 +5,7 @@ BU_vmec = eval_series_nyq(suvgrid,data.bsupumnc,data,'c');
 BV_vmec = eval_series_nyq(suvgrid,data.bsupvmnc,data,'c');
 magB_vmec = eval_series_nyq(suvgrid,data.bmnc,data,'c');
 magB_vmec_sq = magB_vmec.^2;
-abs_g_vmec = abs(eval_series(suvgrid,data.gmnc,data,'c'));
+abs_g_vmec = abs(eval_series_nyq(suvgrid,data.gmnc,data,'c'));
 
 % W = W_magnetic + W_pressure
 % W_magnetic = |B|^2 /2/mu0 , W_pressure = p / (gamma-1)
