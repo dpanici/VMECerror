@@ -10,6 +10,7 @@ refl_phi = -data.phi(data.ns):data.phi(data.ns)/(data.ns-1):data.phi(data.ns);
 arr_size = size(fourier_coeffs);
 refl_coeffs = zeros([arr_size(1) 2*data.ns-1]);
 refl_coeffs(:,data.ns:end) = fourier_coeffs;
+value_s2_deriv_r = zeros(size(refl_coeffs));
 
 for i=1:length(data.xm)
     if mod(data.xm(i),2) == 0
@@ -21,26 +22,32 @@ end
 
 
 if strcmp(deriv_method,'finite difference')
-    for i=2:data.ns-1
-        value_s2_deriv(:,i) = (fourier_coeffs(:,i+1) + fourier_coeffs(:,i-1) - 2 * fourier_coeffs(:,i)) / (data.phi(i+1) - data.phi(i))^2;
+    for i=data.ns:2*data.ns-2
+        value_s2_deriv_r(:,i) = (refl_coeffs(:,i+1) + refl_coeffs(:,i-1) - 2 * refl_coeffs(:,i)) / (refl_phi(i+1) - refl_phi(i))^2;
     end
-    value_s2_deriv(:,1) = (fourier_coeffs(:,3) - 2*fourier_coeffs(:,2) + fourier_coeffs(:,1)) / (data.phi(2) - data.phi(1))^2;
-    value_s2_deriv(:,end) = (fourier_coeffs(:,end) - 2*fourier_coeffs(:,end-1) + fourier_coeffs(:,end-2))  / (data.phi(end) - data.phi(end-1))^2;
-
+    value_s2_deriv_r(:,end) = (fourier_coeffs(:,end) - 2*fourier_coeffs(:,end-1) + fourier_coeffs(:,end-2))  / (data.phi(end) - data.phi(end-1))^2;
+    value_s2_deriv = value_s2_deriv_r(:,data.ns:end);
 elseif strcmp(deriv_method,'spline')
-    spline_fit = spline(refl_phi,refl_coeffs);
-% 	spline_fit = csaps(refl_phi,refl_coeffs,0.999999); % smoothing spline, results in pretty bad looks near axis
+%     spline_fit = spline(refl_phi,refl_coeffs);
+	spline_fit = csaps(refl_phi,refl_coeffs); % smoothing spline, results in pretty bad looks near axis
     spline_deriv_2 = fnder(spline_fit,2);
     value_s2_deriv_refl = ppval(spline_deriv_2,refl_phi);
+    value_s2_deriv = value_s2_deriv_refl(:,data.ns:end);
+elseif strcmp(deriv_method,'spapi') % we can change the order of the spline being used
+    k = 3; % k-1 is the order of spline used
+    fit = spapi(k,refl_phi,refl_coeffs);
+    deriv = fnder(fit,2);
+    value_s2_deriv_refl = fnval(deriv,refl_phi);
     value_s2_deriv = value_s2_deriv_refl(:,data.ns:end);
 elseif strcmp(deriv_method,'pchip')
     fit = pchip(data.phi,fourier_coeffs);
     deriv_2 = fnder(fit,2);
     value_s2_deriv = ppval(deriv_2,data.phi);
 elseif strcmp(deriv_method,'makima')
-    fit = makima(data.phi,fourier_coeffs);
+    fit = makima(refl_phi,refl_coeffs);
     deriv_2 = fnder(fit,2);
-    value_s2_deriv = ppval(deriv_2,data.phi);
+    value_s2_deriv_refl = ppval(deriv_2,refl_phi);
+    value_s2_deriv = value_s2_deriv_refl(:,data.ns:end);
 % elseif strcmp(deriv_method,'chebfun') % requires chebfun toolbox, gives
 % highly oscillatory results
 %     for i=1:length(data.xm)
