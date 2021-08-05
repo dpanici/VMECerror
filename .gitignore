@@ -3,3 +3,4 @@
 *.fig
 test.m
 defunct/*
+*.nc

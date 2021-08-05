@@ -31,7 +31,7 @@ s_index=10; % index of s to plot quantities at (that arent plotted versus s)
 % run('plotting/compare_mag_B')
 
 %% Plot B^2 derivatives
-run('plotting/check_grad_Bsq')
+% run('plotting/check_grad_Bsq')
 
 %% Plot B^u
 
@@ -42,7 +42,7 @@ run('plotting/check_grad_Bsq')
 % run('plotting/compare_BV')
 
 %% Plot J^u, J^v (Units?)
-% run('plotting/compare_J')
+run('plotting/compare_J')
 % 
 %% Plot Cyl B
 
