@@ -138,6 +138,24 @@ zssuumns = s2_deriv(zuumns,d,deriv_method); %Z_ssuu
 
 lssvmnc = s2_deriv(lvmnc,d,deriv_method); %L_ssv
 
+% try with taking s deriv of s deriv
+% rssmnc = s_deriv(rsmnc,d,deriv_method); %R_ss
+% zssmns = s_deriv(zsmns,d,deriv_method); %Z_ss
+% 
+% rssumns = s_deriv(rsumns,d,deriv_method); %R_ssu
+% zssumnc = s_deriv(zsumnc,d,deriv_method); %Z_ssu
+% rssvmns = s_deriv(rsvmns,d,deriv_method); %R_ssv
+% zssvmnc = s_deriv(zsvmnc,d,deriv_method); %Z_ssv
+% 
+% rssuvmnc = s_deriv(rsuvmnc,d,deriv_method); %R_ussv
+% zssuvmns = s_deriv(zsuvmns,d,deriv_method); %Z_ussv
+% 
+% rssuumnc = s_deriv(rsuumnc,d,deriv_method); %R_ssuu
+% zssuumns = s_deriv(zsuumns,d,deriv_method); %Z_ssuu
+% 
+% lssvmnc = s_deriv(lsvmnc,d,deriv_method); %L_ssv
+
+
 %% Numerical third radial derivatives
 rsssmnc = s3_deriv(d.rmnc,d,deriv_method); %R_sss
 zsssmns = s3_deriv(d.zmns,d,deriv_method); %Z_sss

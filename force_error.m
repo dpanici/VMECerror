@@ -6,7 +6,7 @@
 % deriv_method = 'pchip';
 % deriv_method = 'makima';
 
-deriv_method_1d = deriv_method; %deriv method to calculate dp/dr, phi' and chi'
+deriv_method_1d = 'finite difference'; %deriv method to calculate dp/dr, phi' and chi'
 numerical_covariant_B_derivs = false; % calculate cov_B derivs analytically (0) or numerically (1)
 numerical_contravariant_B_derivs = false; % calculate contra_B derivs analytically (0) or numerically (1)
 interpolate = false; % whether or not to interpolate R,L,Z onto a finer grid before calculating force (not yet implemented)

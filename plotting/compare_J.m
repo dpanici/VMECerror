@@ -23,6 +23,7 @@ xlabel('s')
 ylabel('sqrt(g)*J^u')
 legend('My Calc','VMEC')
 ylim([min(JU_vmec(s_index:end,u_index,v_nfp_index)),max(JU_vmec(s_index:end,u_index,v_nfp_index))]);
+
 % plot J
 figure()
 
@@ -39,6 +40,7 @@ legend('My Calc','VMEC')
 ylim([min(JU_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index)),max(JU_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index))]);
 % ylim([-1.5e4,3e5])
 
+
 % plot J * g
 figure()
 plot(data.phi(s_index:end),JV(s_index:end,u_index,v_nfp_index).*g(s_index:end,u_index,v_nfp_index))
@@ -50,6 +52,8 @@ hold on
 plot(data.phi(s_index:end),JV_vmec(s_index:end,u_index,v_nfp_index))
 legend('mine','VMEC')
 ylim([min(JV_vmec(s_index:end,u_index,v_nfp_index)),max(JV_vmec(s_index:end,u_index,v_nfp_index))]);
+
+legend('My Calc','VMEC','Quintic')
 
 %plot J
 figure()

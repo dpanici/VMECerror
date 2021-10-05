@@ -1,5 +1,5 @@
 close all
-u_index= 80; % index of u to plot quantities at
+u_index= 40; % index of u to plot quantities at
 v_nfp_index=1; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
 s_index=10; % i

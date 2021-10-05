@@ -49,7 +49,7 @@ for cpu=cpus
       try
         data = read_vmec(file);
         force_error
-	[val,s_ind] = min(abs(data.phi-0.1));
+        [val,s_ind] = min(abs(data.phi-0.1));
         plot_force_error
         
 %         F_avgg = nanmean(F(:,:,:).*abs(abs_g_vmec),'all')/nanmean(mag_grad_B_pres(:,:,:).*abs(abs_g_vmec),'all')*mu0;

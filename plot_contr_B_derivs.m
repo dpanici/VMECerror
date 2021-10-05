@@ -1,6 +1,6 @@
 close all
 u_index= 7; % index of u to plot quantities at
-v_nfp_index=75; % index of v to plot quantities at
+v_nfp_index=40; % index of v to plot quantities at
 nfp_v_index = v_nfp_index;
 s_index=50; % index of s to plot quantities at (that arent plotted versus s)
 
