@@ -121,6 +121,27 @@ zsvvmns = s_deriv(zvvmns,d,deriv_method); %Z_svv
 lsumnc = s_deriv(lumnc,d,deriv_method); %L_su
 lsvmnc = s_deriv(lvmnc,d,deriv_method); %L_sv
 lsvvmns = s_deriv(lvvmns,d,deriv_method); %L_svv
+
+% rsmnc = rho_deriv(d.rmnc,d,deriv_method); %R_s
+% zsmns = rho_deriv(d.zmns,d,deriv_method); %Z_s
+% rsvmns = rho_deriv(rvmns,d,deriv_method); %R_sv
+% rsumns = rho_deriv(d.rumns,d,deriv_method); %R_su
+% zsvmnc = rho_deriv(zvmnc,d,deriv_method); %Z_sv
+% zsumnc = rho_deriv(d.zumnc,d,deriv_method); %Z_su
+% 
+% rsuumnc = rho_deriv(ruumnc,d,deriv_method); %R_suu
+% zsuumns = rho_deriv(zuumns,d,deriv_method); %Z_suu
+% rsuvmnc = rho_deriv(ruvmnc,d,deriv_method); %R_suv
+% zsuvmns = rho_deriv(zuvmns,d,deriv_method); %Z_suv
+% 
+% rsvvmnc = rho_deriv(rvvmnc,d,deriv_method); %R_svv
+% zsvvmns = rho_deriv(zvvmns,d,deriv_method); %Z_svv
+% 
+% lsumnc = rho_deriv(lumnc,d,deriv_method); %L_su
+% lsvmnc = rho_deriv(lvmnc,d,deriv_method); %L_sv
+% lsvvmns = rho_deriv(lvvmns,d,deriv_method); %L_svv
+
+
 %% Numerical second radial derivatives
 rssmnc = s2_deriv(d.rmnc,d,deriv_method); %R_ss
 zssmns = s2_deriv(d.zmns,d,deriv_method); %Z_ss

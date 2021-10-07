@@ -8,7 +8,6 @@ global SPLINE_ORDER_SPAPI
 global SPLINE_TENSION
 global FACTOR_S
 global SMOOTH_FACTOR
-% global SPLINE_SMOOTHNESS
 value_s_deriv = zeros(size(fourier_coeffs));
 % reflect phi over axis for smoother derivatives at axis
 refl_phi = -data.phi(data.ns):data.phi(data.ns)/(data.ns-1):data.phi(data.ns);

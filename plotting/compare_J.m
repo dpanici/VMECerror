@@ -68,10 +68,30 @@ legend('mine','VMEC')
 ylim([min(JV_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index)),max(JV_vmec(s_index:end,u_index,v_nfp_index)./g_vmec(s_index:end,u_index,v_nfp_index))]);
 % ylim([2.45e4,3.5e4])
 
+% plot our JS
+%plot J
+figure()
+% plot(data.phi(s_index:end),JV(s_index:end,u_index,v_nfp_index).*g(s_index:end,u_index,v_nfp_index))
+plot(sqrt(data.phi(s_index:end)),JS(s_index:end,u_index,v_nfp_index))
+title(sprintf('J^s vs rho at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
+xlabel('rho')
+ylabel('J^s')
+
+
 
 %% 2D
 clims = [0,1e4];
 clims_ratio = [0,0.3];
+%% JS
+figure()
+pcolor(u,s,log10(abs(JS(:,:,nfp_v_index))))
+colormap jet
+% caxis(clims)
+colorbar
+xlabel('u')
+ylabel('s')
+title(sprintf('My JS at v = %f',v(v_nfp_index)))
+
 %% JU
 % s,u
 figure()
