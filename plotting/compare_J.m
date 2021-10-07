@@ -76,6 +76,11 @@ plot(sqrt(data.phi(s_index:end)),JS(s_index:end,u_index,v_nfp_index))
 title(sprintf('J^s vs rho at u=%f, nfp*phi=%f',u(u_index),v(v_nfp_index)))
 xlabel('rho')
 ylabel('J^s')
+v_ind=1;
+writematrix(R(:,:,1),sprintf('../VMEC_W7X_s2048_R_JS_phi_%1.3f.csv',v(v_ind)))
+writematrix(Z(:,:,1),sprintf('../VMEC_W7X_s2048_Z_JS_phi_%1.3f.csv',v(v_ind)))
+writematrix(JS(:,:,1),sprintf('../VMEC_W7X_s2048_JS_phi_%1.3f.csv',v(v_ind)))
+
 
 
 
@@ -84,13 +89,24 @@ clims = [0,1e4];
 clims_ratio = [0,0.3];
 %% JS
 figure()
-pcolor(u,s,log10(abs(JS(:,:,nfp_v_index))))
+h=pcolor(u,s,log10(abs(JS(:,:,nfp_v_index))))
+set(h, 'EdgeColor', 'none');
 colormap jet
-% caxis(clims)
+caxis([-1,5])
 colorbar
 xlabel('u')
 ylabel('s')
 title(sprintf('My JS at v = %f',v(v_nfp_index)))
+
+figure()
+pcolor(v,u,reshape(JS(200,:,:),[dimU,dimV]))
+colormap jet
+% caxis(clims)
+colorbar
+xlabel('v')
+ylabel('u')
+title(sprintf('My calc JS at s = %f',data.phi(s_index)))
+
 
 %% JU
 % s,u
