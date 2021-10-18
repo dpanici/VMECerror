@@ -18,8 +18,10 @@ refl_coeffs = zeros([arr_size(1) 2*data.ns-1]);
 refl_coeffs(:,data.ns:end) = fourier_coeffs;
 value_s_deriv_refl = zeros(size(refl_coeffs));
 
-for i=1:length(data.xm)
-    if mod(data.xm(i),2) == 0
+
+
+for i=1:length(data.xm_nyq)
+    if mod(data.xm_nyq(i),2) == 0
         refl_coeffs(i,1:data.ns-1) = flip(fourier_coeffs(i,2:end));
     else % odd parity, negate the coeff when reflecting about phi = 0
         refl_coeffs(i,1:data.ns-1) = -flip(fourier_coeffs(i,2:end));
@@ -128,7 +130,7 @@ elseif strcmp(deriv_method,'tension_spline') %% here could either fit 4 points a
     second_deriv = false;
     t = SPLINE_TENSION;
     for i=1:length(data.xm)
-        [~,deriv_out,~] = spline1d(refl_phi,refl_phi,refl_coeffs(i,1:end),[],[],t,first_deriv,second_deriv); % smoothing spline, results in pretty bad looks near axis
+        [~,deriv_out,~] = spline1d(refl_phi,refl_phi,refl_coeffs(i,1:end),[],[],t,first_deriv,second_deriv); 
         value_s_deriv(i,1:end) = deriv_out(data.ns:end);
     end
 
@@ -161,7 +163,7 @@ elseif strcmp(deriv_method,'makima')
 %         value_s_deriv(i,:) = value_s_deriv_refl(data.ns:end);
 %     end
 elseif strcmp(deriv_method,'poly') % global polyfit, but maybe a local piecewise would be better, going 2^n at a time
-    for i=1:length(data.xm)
+    for i=1:length(data.xm_nyq)
     fit = polyfit(refl_phi,refl_coeffs(i,:),POLYFIT_DEGREE);
     deriv_1 = polyder(fit);
     value_s_deriv_refl = polyval(deriv_1,refl_phi);

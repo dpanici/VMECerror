@@ -7,6 +7,7 @@ function value_s2_deriv=s2_deriv(fourier_coeffs,data,deriv_method)
 global SPLINE_ORDER_SPAPI
 global FACTOR_S
 global SMOOTH_FACTOR
+global POLYFIT_DEGREE
 value_s2_deriv = zeros(size(data.rmnc));
 
 refl_phi = -data.phi(data.ns):data.phi(data.ns)/(data.ns-1):data.phi(data.ns);
@@ -33,6 +34,18 @@ if strcmp(deriv_method,'finite difference')
     end
     value_s2_deriv_r(:,end) = (fourier_coeffs(:,end) - 2*fourier_coeffs(:,end-1) + fourier_coeffs(:,end-2))  / (data.phi(end) - data.phi(end-1))^2;
     value_s2_deriv = value_s2_deriv_r(:,data.ns:end);
+elseif strcmp(deriv_method,'finite difference 4th') % 4th order acc finite difference for 2nd deriv
+    for i=data.ns:2*data.ns-3
+        value_s2_deriv_r(:,i) = (- refl_coeffs(:,i-2) + 16 * refl_coeffs(:,i-1) - 30 * refl_coeffs(:,i) + 16 * refl_coeffs(:,i+1) - refl_coeffs(:,i+2)) / 12/(refl_phi(i+1) - refl_phi(i))^2;
+    end
+    % second to last pt with 3rd order accurate
+    i = 2*data.ns-2;
+    value_s2_deriv_r(:,i) = (11 * refl_coeffs(:,i-3) - 20 * refl_coeffs(:,i-2) + 6 * refl_coeffs(:,i-1) + 4 * refl_coeffs(:,i) - refl_coeffs(:,i+1)) / 12/(refl_phi(i+1) - refl_phi(i))^2;
+    % last with first order accurate
+%     i = 2*data.ns-1:
+    value_s2_deriv_r(:,i) = (fourier_coeffs(:,end) - 2*fourier_coeffs(:,end-1) + fourier_coeffs(:,end-2))  / (data.phi(end) - data.phi(end-1))^2;
+    value_s2_deriv = value_s2_deriv_r(:,data.ns:end);
+    
 elseif strcmp(deriv_method,'factor difference')
     % factor rho^m then do finite diff
     % but only factor out to do the first few derivatives, not the entire
@@ -182,6 +195,15 @@ elseif strcmp(deriv_method,'tension_spline') %% here could either fit 4 points a
 %         value_s_deriv_refl = feval(deriv_2,refl_phi);
 %         value_s2_deriv(i,:) = value_s_deriv_refl(data.ns:end);
 %     end
+elseif strcmp(deriv_method,'poly') % global polyfit, but maybe a local piecewise would be better, going 2^n at a time
+    for i=1:length(data.xm)
+    fit = polyfit(refl_phi,refl_coeffs(i,:),POLYFIT_DEGREE);
+    deriv_1 = polyder(fit);
+    deriv_2 = polyder(deriv_1);
+    
+    value_s2_deriv_refl = polyval(deriv_2,refl_phi);
+    value_s2_deriv(i,:) = value_s2_deriv_refl(data.ns:end);
+    end
 end
 
 end

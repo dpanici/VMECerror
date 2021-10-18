@@ -59,14 +59,14 @@ for cpu=cpus
         
 %        F_V_avg = trapz(v,trapz(u,trapz(s(s_2:end),F(2:end,:,:).*abs_g_vmec(2:end,:,:)))) ./ data.Volume;
 %        p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ data.Volume;
-
-        F_V_avg = trapz(v,trapz(u,trapz(s(s_ind:end),F(s_ind:end,:,:).*abs_g_vmec(s_ind:end,:,:)))) ./ data.Volume;
+        vol = trapz(v,trapz(u,trapz(s(s_ind:end),abs_g_vmec(s_ind:end,:,:))))
+        F_V_avg = trapz(v,trapz(u,trapz(s(s_ind:end-10),F(s_ind:end-10,:,:).*abs_g_vmec(s_ind:end-10,:,:)))) ./ vol;
         p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ data.Volume;
         F_avgg = F_V_avg / p_V_avg
         E = VMEC_W_B + W_p;
         
-        dlmwrite(sprintf('%s/%s',foldername,force_filename),F_avgg);
-        dlmwrite(sprintf('%s/E.txt',foldername),E);
+%         dlmwrite(sprintf('%s/%s',foldername,force_filename),F_avgg);
+%         dlmwrite(sprintf('%s/E.txt',foldername),E);
      catch e
          warning('Error, likely no wout for %s',file);
          fprintf(1,'The identifier was:\n%s',e.identifier);

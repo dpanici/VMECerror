@@ -9,6 +9,8 @@
 deriv_method_1d = 'finite difference'; %deriv method to calculate dp/dr, phi' and chi'
 numerical_covariant_B_derivs = 0; % calculate cov_B derivs analytically (0) or numerically (1)
 numerical_contravariant_B_derivs = 0; % calculate contra_B derivs analytically (0) or numerically (1)
+use_VMEC_contr_B = 0; % use VMEC contr B components to take derivs of and get cov B derivs and then J
+use_VMEC_cov_B = 0;% use VMEC cov B components to take derivs of and get J (supersedes use VMEC contr B)
 interpolate = false; % whether or not to interpolate R,L,Z onto a finer grid before calculating force (not yet implemented)
 only_energy=false; % only calculate energy, don't calculate force error
 
@@ -36,11 +38,12 @@ suvgrid = ndgrid(s,u,v);
 
 
 %% Flux, iota,and pressure derivs
+% should just derive data.ai to get exact derivative of iota
 iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv_non_refl(iota,data,deriv_method_1d))',1,dimU,dimV); % radial deriv of rotational transform
 
 
-
+% deriv of phir is one
 Phir = s_deriv_non_refl(Phi,data,deriv_method_1d);
 chi = data.chi./2./pi; % poloidal flux
 chir = repmat((iota .* Phir)',1,dimU,dimV); % radial deriv of poloidal flux 
@@ -240,6 +243,14 @@ BV_sa = BV_s;
 BV_ua = BV_u;
 BV_va = BV_v;
 
+% use VMEC BU,BV fourier coeffs, get derivs
+if use_VMEC_contr_B
+BV_smnc = s_deriv_nyq(data.bsupvmnc,data,deriv_method);
+BV_s = eval_series_nyq(suvgrid,BV_smnc,data,'c');
+BU_smnc = s_deriv_nyq(data.bsupvmnc,data,deriv_method);
+BU_s = eval_series_nyq(suvgrid,BU_smnc,data,'c');
+end
+
 %% numerical contravariant B derivatives
 if numerical_contravariant_B_derivs
     BU_s = real_space_deriv(BU,s,deriv_method);
@@ -309,6 +320,25 @@ if numerical_covariant_B_derivs
     plot_cov_B
 end
 
+% dont worry about half mesh stuff right now
+if use_VMEC_cov_B
+Bv_smnc = s_deriv_nyq(data.bsubvmnc,data,deriv_method);
+Bv_s = eval_series_nyq(suvgrid,Bv_smnc,data,'c');
+Bv_umns = -data.bsubvmnc .* data.xm_nyq';
+Bv_u = eval_series_nyq(suvgrid,Bv_umns,data,'s');
+
+Bu_smnc = s_deriv_nyq(data.bsubumnc,data,deriv_method);
+Bu_s = eval_series_nyq(suvgrid,Bu_smnc,data,'c');
+Bu_vmns = -data.bsubumnc .* data.xn_nyq';
+Bu_v = eval_series_nyq(suvgrid,Bu_vmns,data,'s');
+
+Bs_vmnc = data.bsubsmns .* data.xn_nyq';
+Bs_v = eval_series_nyq(suvgrid,Bs_vmnc,data,'c');
+Bs_umnc = data.bsubsmns .* data.xm_nyq';
+Bs_u = eval_series_nyq(suvgrid,Bs_umnc,data,'c');
+
+end
+
 
 
 
@@ -337,6 +367,13 @@ F_beta = JS;
 F = sqrt((F_s.^2).*gSS + (F_beta.^2).*(new_mag_beta.^2));
 
 get_energy
+
+
+% get FSAs of each of above quantities
+
+
+
+
 
 
 
