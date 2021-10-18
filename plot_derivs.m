@@ -32,14 +32,14 @@ end
 % legend('chi','chi_s','-iota.*Phir')
 
 %% Angular Derivs - All good after realizing sign error in v derivs
-derivplot(R,R_u,u)% good
-derivplot(Z,Z_u,u) % good
-derivplot(R,R_v,v) % good
-hold on
-plot(v,reshape(R_v_vmec(s_index,u_index,:),size(v)),'k--')
-derivplot(Z,Z_v,v) % good
-hold on
-plot(v,reshape(Z_v_vmec(s_index,u_index,:),size(v)),'k--')
+% derivplot(R,R_u,u)% good
+% derivplot(Z,Z_u,u) % good
+% derivplot(R,R_v,v) % good
+% hold on
+% plot(v,reshape(R_v_vmec(s_index,u_index,:),size(v)),'k--')
+% derivplot(Z,Z_v,v) % good
+% hold on
+% plot(v,reshape(Z_v_vmec(s_index,u_index,:),size(v)),'k--')
 % derivplot(L,L_u,u) % good % Matches VMECplot
 % derivplot(L,L_v,v) % good % L actually matches VMEC plot too...
 %  
@@ -58,11 +58,11 @@ plot(v,reshape(Z_v_vmec(s_index,u_index,:),size(v)),'k--')
 % derivplot(L_v,L_uv,u) % good
 
 %% Radial Derivatives
-% derivplot(R,R_s,s) % good
-% derivplot(Z,Z_s,s) % good
+derivplot(R,R_s,s) % good
+derivplot(Z,Z_s,s) % good
 % % 
-% derivplot(R_s,R_ss,s) % good
-% derivplot(Z_s,Z_ss,s) % good
+derivplot(R_s,R_ss,s) % good
+derivplot(Z_s,Z_ss,s) % good
 % 
 % derivplot(R_u,R_su,s) % good
 % derivplot(Z_u,Z_su,s) % good

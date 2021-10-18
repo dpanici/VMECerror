@@ -3,7 +3,7 @@ function foo = derivplot(value,deriv,var_wrt_to)
 valname = inputname(1);
 derivname = inputname(2);
 wrtname = inputname(3);
-sindex=10;
+sindex=2;
 uindex=6;
 vindex=1;
 figure()
@@ -11,7 +11,7 @@ yyaxis left
 if wrtname == 'u'
     plot(var_wrt_to,value(sindex,:,vindex))
 elseif wrtname == 's'
-    plot(var_wrt_to,value(:,uindex,vindex))
+    plot(var_wrt_to(sindex:end),value(sindex:end,uindex,vindex))
 elseif wrtname == 'v'
     plot(var_wrt_to,reshape(value(sindex,uindex,:),size(var_wrt_to)))
 end     
@@ -22,7 +22,7 @@ yyaxis right
 if wrtname == 'u'
     plot(var_wrt_to,deriv(sindex,:,vindex))
 elseif wrtname == 's'
-    plot(var_wrt_to,deriv(:,uindex,vindex))
+    plot(var_wrt_to(sindex:end),deriv(sindex:end,uindex,vindex))
 elseif wrtname == 'v'
     plot(var_wrt_to,reshape(deriv(sindex,uindex,:),size(var_wrt_to)))
 end     
