@@ -34,6 +34,13 @@ if strcmp(deriv_method,'finite difference')
     
     value_s_deriv_refl(:,end) = (refl_coeffs(:,end) - refl_coeffs(:,end-1)) / (refl_phi(end) - refl_phi(end-1));
     value_s_deriv = value_s_deriv_refl(:,data.ns:end);
+elseif strcmp(deriv_method,'finite difference 1st')% only use forward or backward diff
+    for i=data.ns:2*data.ns-2
+        value_s_deriv_refl(:,i) = (refl_coeffs(:,i+1) - refl_coeffs(:,i)) / (refl_phi(i+1) - refl_phi(i));
+    end
+    
+    value_s_deriv_refl(:,end) = (refl_coeffs(:,end) - refl_coeffs(:,end-1)) / (refl_phi(end) - refl_phi(end-1));
+    value_s_deriv = value_s_deriv_refl(:,data.ns:end);
 elseif strcmp(deriv_method,'finite difference 4th') % 4th order accurate central diff using 5-point formula
     for i=data.ns:2*data.ns-3
         value_s_deriv_refl(:,i) = (refl_coeffs(:,i-2) + 8*refl_coeffs(:,i+1) - 8*refl_coeffs(:,i-1) - refl_coeffs(:,i+2)) / 12 / (refl_phi(i+1) - refl_phi(i));

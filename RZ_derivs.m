@@ -93,16 +93,11 @@ for i=2:d.ns
     lmns(:,i) = 1/2*(d.lmns(:,i-1)+d.lmns(:,i));
 end
 lmns(:,end) = 3/2 * d.lmns(:,end-1) - 0.5*d.lmns(:,end-2);
-lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2);
 lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2); % should be axis limit for lambda
 
 
-% lmns = d.lmns;
+% lmns = d.lmns; % uncomment to use lambda on half mesh, is incorrect but makes F at edge lower for some reason 
 
-% plot(data.phi+(s(2)-s(1))/2,data.lmns(3,:),'x','DisplayName','half mesh')
-% hold on
-% plot(data.phi,lmns(3,:),'.','DisplayName','full mesh 2nd way')
-% legend
 
 %L_u = lmns * m * cos(m*u+n*v*nfp)
 lumnc = lmns .* xm';
@@ -119,92 +114,8 @@ lvvmns = - lmns .* (xn.^2)';
 % L_uv = lmns * m * n * nfp * sin(m*u - n*v*nfp)
 luvmns = -lmns .* xm' .* xn';
 
-%% Numerical first radial derivatives
-if use_piecewise_lsq == false
-rsmnc = s_deriv(d.rmnc,d,deriv_method); %R_s
-zsmns = s_deriv(d.zmns,d,deriv_method); %Z_s
-rsvmns = s_deriv(rvmns,d,deriv_method); %R_sv
-rsumns = s_deriv(d.rumns,d,deriv_method); %R_su
-zsvmnc = s_deriv(zvmnc,d,deriv_method); %Z_sv
-zsumnc = s_deriv(d.zumnc,d,deriv_method); %Z_su
 
-rsuumnc = s_deriv(ruumnc,d,deriv_method); %R_suu
-zsuumns = s_deriv(zuumns,d,deriv_method); %Z_suu
-rsuvmnc = s_deriv(ruvmnc,d,deriv_method); %R_suv
-zsuvmns = s_deriv(zuvmns,d,deriv_method); %Z_suv
-
-rsvvmnc = s_deriv(rvvmnc,d,deriv_method); %R_svv
-zsvvmns = s_deriv(zvvmns,d,deriv_method); %Z_svv
-
-
-
-lsumnc = s_deriv(lumnc,d,deriv_method); %L_su
-lsvmnc = s_deriv(lvmnc,d,deriv_method); %L_sv
-lsvvmns = s_deriv(lvvmns,d,deriv_method); %L_svv
-end
-% rsmnc = rho_deriv(d.rmnc,d,deriv_method); %R_s
-% zsmns = rho_deriv(d.zmns,d,deriv_method); %Z_s
-% rsvmns = rho_deriv(rvmns,d,deriv_method); %R_sv
-% rsumns = rho_deriv(d.rumns,d,deriv_method); %R_su
-% zsvmnc = rho_deriv(zvmnc,d,deriv_method); %Z_sv
-% zsumnc = rho_deriv(d.zumnc,d,deriv_method); %Z_su
-% 
-% rsuumnc = rho_deriv(ruumnc,d,deriv_method); %R_suu
-% zsuumns = rho_deriv(zuumns,d,deriv_method); %Z_suu
-% rsuvmnc = rho_deriv(ruvmnc,d,deriv_method); %R_suv
-% zsuvmns = rho_deriv(zuvmns,d,deriv_method); %Z_suv
-% 
-% rsvvmnc = rho_deriv(rvvmnc,d,deriv_method); %R_svv
-% zsvvmns = rho_deriv(zvvmns,d,deriv_method); %Z_svv
-% 
-% lsumnc = rho_deriv(lumnc,d,deriv_method); %L_su
-% lsvmnc = rho_deriv(lvmnc,d,deriv_method); %L_sv
-% lsvvmns = rho_deriv(lvvmns,d,deriv_method); %L_svv
-
-
-
-
-%% Numerical second radial derivatives
-if use_piecewise_lsq == false
-rssmnc = s2_deriv(d.rmnc,d,deriv_method); %R_ss
-zssmns = s2_deriv(d.zmns,d,deriv_method); %Z_ss
-
-rssumns = s2_deriv(d.rumns,d,deriv_method); %R_ssu
-zssumnc = s2_deriv(d.zumnc,d,deriv_method); %Z_ssu
-rssvmns = s2_deriv(rvmns,d,deriv_method); %R_ssv
-zssvmnc = s2_deriv(zvmnc,d,deriv_method); %Z_ssv
-
-rssuvmnc = s2_deriv(ruvmnc,d,deriv_method); %R_ussv
-zssuvmns = s2_deriv(zuvmns,d,deriv_method); %Z_ussv
-
-rssuumnc = s2_deriv(ruumnc,d,deriv_method); %R_ssuu
-zssuumns = s2_deriv(zuumns,d,deriv_method); %Z_ssuu
-
-lssvmnc = s2_deriv(lvmnc,d,deriv_method); %L_ssv
-end
-% try with taking s deriv of s deriv
-% rssmnc = s_deriv(rsmnc,d,deriv_method); %R_ss
-% zssmns = s_deriv(zsmns,d,deriv_method); %Z_ss
-% 
-% rssumns = s_deriv(rsumns,d,deriv_method); %R_ssu
-% zssumnc = s_deriv(zsumnc,d,deriv_method); %Z_ssu
-% rssvmns = s_deriv(rsvmns,d,deriv_method); %R_ssv
-% zssvmnc = s_deriv(zsvmnc,d,deriv_method); %Z_ssv
-% 
-% rssuvmnc = s_deriv(rsuvmnc,d,deriv_method); %R_ussv
-% zssuvmns = s_deriv(zsuvmns,d,deriv_method); %Z_ussv
-% 
-% rssuumnc = s_deriv(rsuumnc,d,deriv_method); %R_ssuu
-% zssuumns = s_deriv(zsuumns,d,deriv_method); %Z_ssuu
-% 
-% lssvmnc = s_deriv(lsvmnc,d,deriv_method); %L_ssv
-
-%% use piecewise least squares
-% save the polynomial coeffs 
-global POLY_LSQ_WINDOW_SIZE
-POLY_LSQ_WINDOW_SIZE=8; % 16 was good and 6 poly order
-global POLY_LSQ_ORDER
-POLY_LSQ_ORDER = 5; % polynomial order
+% deriv_method here is a superfluous argument, it is not used
 if use_piecewise_lsq
     [rsmnc,rssmnc] = least_squares_fit_coeffs(d.rmnc,d,deriv_method); %R_s
     [zsmns,zssmns] = least_squares_fit_coeffs(d.zmns,d,deriv_method); %Z_s
@@ -224,8 +135,70 @@ if use_piecewise_lsq
     [lsumnc,lssumnc] = least_squares_fit_coeffs(lumnc,d,deriv_method); %L_su
     [lsvmnc,lssvmnc] = least_squares_fit_coeffs(lvmnc,d,deriv_method); %L_sv
     [lsvvmns,lssvvmns] = least_squares_fit_coeffs(lvvmns,d,deriv_method); %L_svv
-end
+elseif use_my_cubic_spline
+    [rsmnc,rssmnc] = spline_fit_one_sided_fourier_coeffs(d.rmnc,d,deriv_method); %R_s
+    [zsmns,zssmns] = spline_fit_one_sided_fourier_coeffs(d.zmns,d,deriv_method); %Z_s
+    [rsvmns,rssvmns] = spline_fit_one_sided_fourier_coeffs(rvmns,d,deriv_method); %R_sv
+    [rsumns,rssumns] = spline_fit_one_sided_fourier_coeffs(d.rumns,d,deriv_method); %R_su
+    [zsvmnc,zssvmnc] = spline_fit_one_sided_fourier_coeffs(zvmnc,d,deriv_method); %Z_sv
+    [zsumnc,zssumnc] = spline_fit_one_sided_fourier_coeffs(d.zumnc,d,deriv_method); %Z_su
 
+    [rsuumnc,rssuumnc] = spline_fit_one_sided_fourier_coeffs(ruumnc,d,deriv_method); %R_suu
+    [zsuumns,zssuumns] = spline_fit_one_sided_fourier_coeffs(zuumns,d,deriv_method); %Z_suu
+    [rsuvmnc,rssuvmnc] = spline_fit_one_sided_fourier_coeffs(ruvmnc,d,deriv_method); %R_suv
+    [zsuvmns,zssuvmns] = spline_fit_one_sided_fourier_coeffs(zuvmns,d,deriv_method); %Z_suv
+
+    [rsvvmnc,rssvvmnc] = spline_fit_one_sided_fourier_coeffs(rvvmnc,d,deriv_method); %R_svv
+    [zsvvmns,zssvvmns] = spline_fit_one_sided_fourier_coeffs(zvvmns,d,deriv_method); %Z_svv
+
+    [lsumnc,lssumnc] = spline_fit_one_sided_fourier_coeffs(lumnc,d,deriv_method); %L_su
+    [lsvmnc,lssvmnc] = spline_fit_one_sided_fourier_coeffs(lvmnc,d,deriv_method); %L_sv
+    [lsvvmns,lssvvmns] = spline_fit_one_sided_fourier_coeffs(lvvmns,d,deriv_method); %L_svv    
+    else
+
+%% Numerical first radial derivatives
+
+    rsmnc = s_deriv(d.rmnc,d,deriv_method); %R_s
+    zsmns = s_deriv(d.zmns,d,deriv_method); %Z_s
+    rsvmns = s_deriv(rvmns,d,deriv_method); %R_sv
+    rsumns = s_deriv(d.rumns,d,deriv_method); %R_su
+    zsvmnc = s_deriv(zvmnc,d,deriv_method); %Z_sv
+    zsumnc = s_deriv(d.zumnc,d,deriv_method); %Z_su
+
+    rsuumnc = s_deriv(ruumnc,d,deriv_method); %R_suu
+    zsuumns = s_deriv(zuumns,d,deriv_method); %Z_suu
+    rsuvmnc = s_deriv(ruvmnc,d,deriv_method); %R_suv
+    zsuvmns = s_deriv(zuvmns,d,deriv_method); %Z_suv
+
+    rsvvmnc = s_deriv(rvvmnc,d,deriv_method); %R_svv
+    zsvvmns = s_deriv(zvvmns,d,deriv_method); %Z_svv
+
+
+
+    lsumnc = s_deriv(lumnc,d,deriv_method); %L_su
+    lsvmnc = s_deriv(lvmnc,d,deriv_method); %L_sv
+    lsvvmns = s_deriv(lvvmns,d,deriv_method); %L_svv
+
+
+
+%% Numerical second radial derivatives
+% if use_piecewise_lsq == false
+rssmnc = s2_deriv(d.rmnc,d,deriv_method); %R_ss
+zssmns = s2_deriv(d.zmns,d,deriv_method); %Z_ss
+
+rssumns = s2_deriv(d.rumns,d,deriv_method); %R_ssu
+zssumnc = s2_deriv(d.zumnc,d,deriv_method); %Z_ssu
+rssvmns = s2_deriv(rvmns,d,deriv_method); %R_ssv
+zssvmnc = s2_deriv(zvmnc,d,deriv_method); %Z_ssv
+
+rssuvmnc = s2_deriv(ruvmnc,d,deriv_method); %R_ussv
+zssuvmns = s2_deriv(zuvmns,d,deriv_method); %Z_ussv
+
+rssuumnc = s2_deriv(ruumnc,d,deriv_method); %R_ssuu
+zssuumns = s2_deriv(zuumns,d,deriv_method); %Z_ssuu
+
+lssvmnc = s2_deriv(lvmnc,d,deriv_method); %L_ssv
+end
 
 
 

@@ -259,7 +259,7 @@ if numerical_contravariant_B_derivs
     BV_s = real_space_deriv(BV,s,deriv_method);
     BV_u = real_space_deriv(BV,u,deriv_method);
     BV_v = real_space_deriv(BV,v,deriv_method);
-    plot_contr_B_derivs
+    run('plotting/plot_contr_B_derivs')
 end
 
 
@@ -317,7 +317,7 @@ if numerical_covariant_B_derivs
 
     Bv_s = real_space_deriv(Bv,s,deriv_method);
     Bv_u = real_space_deriv(Bv,u,deriv_method);
-    plot_cov_B
+    run('plotting/plot_cov_B')
 end
 
 % dont worry about half mesh stuff right now

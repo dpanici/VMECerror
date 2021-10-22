@@ -13,7 +13,16 @@ k = POLY_LSQ_ORDER;
 s_deriv = zeros(size(coeffs));
 s2_deriv = zeros(size(coeffs));
 
-m = data.ns / window_size;
+m = floor(data.ns / window_size);
+remainder_window = mod(data.ns,window_size);
+if remainder_window ~= 0
+    remainder_degree = remainder_window-1;
+    if remainder_window < k 
+        remainder_window = remainder_window + window_size; % too small of window to fit
+        m = m-1;
+        remainder_degree=k-1;
+    end
+end
 N = data.ns;
 
 x = linspace(0,1,N);
@@ -22,7 +31,7 @@ for mode_ind=1:length(data.xm)
     cs = zeros([m,k]);
     for i=1:m
     
-    inds = (1+(i-1)*N/m:i*N/m);
+    inds = (1+(i-1)*window_size:i*window_size);
     cs(i,:)= least_squares_fit(x(inds), y(inds), k)'; 
     s_deriv_c = polyder(cs(i,:));
     s_deriv(mode_ind,inds)=polyval(s_deriv_c,x(inds));
@@ -31,7 +40,14 @@ for mode_ind=1:length(data.xm)
     s2_deriv(mode_ind,inds)=polyval(s2_deriv_c,x(inds));
     
     end
+    if remainder_window ~= 0
+        inds = (1+ data.ns-remainder_window:data.ns);
+        cs(i,:)= least_squares_fit(x(inds), y(inds), k)'; 
+        s_deriv_c = polyder(cs(i,:));
+        s_deriv(mode_ind,inds)=polyval(s_deriv_c,x(inds));
 
-
+        s2_deriv_c = polyder(s_deriv_c);
+        s2_deriv(mode_ind,inds)=polyval(s2_deriv_c,x(inds));
+    end
 end
 end
