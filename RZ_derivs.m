@@ -88,7 +88,7 @@ lmns = zeros(size(d.lmns));
 % plot(data.phi,lmns(3,:),'DisplayName','full mesh 1st way')
 % hold on
 
-
+if use_lambda_full_mesh
 for i=2:d.ns
     lmns(:,i) = 1/2*(d.lmns(:,i-1)+d.lmns(:,i));
 end
@@ -96,9 +96,9 @@ lmns(:,end) = 3/2 * d.lmns(:,end-1) - 0.5*d.lmns(:,end-2);
 lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2);
 lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2); % should be axis limit for lambda
 
-
-% lmns = d.lmns;
-
+else
+lmns = d.lmns;
+end
 % plot(data.phi+(s(2)-s(1))/2,data.lmns(3,:),'x','DisplayName','half mesh')
 % hold on
 % plot(data.phi,lmns(3,:),'.','DisplayName','full mesh 2nd way')
