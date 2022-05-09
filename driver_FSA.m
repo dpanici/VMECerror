@@ -1,119 +1,64 @@
 %% runs force_error script and plots force error
 close all
-clearvars -except F_fsa iota_old JV_smoothed F_FSA_fac Bu_half_mesh Bu_s_half_mesh
-% if exist('F_fsa','var')
-% F_FSA_fac = F_fsa;
-% end
-u_index= 11; % index of u to plot quantities at
-v_nfp_index=1; % index of v to plot quantities at
-nfp_v_index = v_nfp_index;
-s_index=6; % index of s to plot quantities at
+clearvars
 
-path_to_W7X = '/p/desc-usr/dpanici/vmec/W7X_pressure/';
-% load in VMEC data then run force error to calculate everything
-
-% plot force_error will do as its name implies
-% plot_force_error
-% deriv_method='factor difference';
-deriv_method='finite difference';
-% deriv_method = 'spapi'
-% deriv_method = 'spline'
-% deriv_method='poly'
-% deriv_method = 'smooth_spline'
-% deriv_method='tension_spline'
-use_piecewise_lsq = false; % 
-Ns = [1 2 3];
-Ms = [8 10 12 14 16];
-%Ms = [14 16]
-%ftols = [4 8 12];
-ftols = [4 8 12];
-
-s_nums = [128 256 512 1024 2048]; %no s1024 needed for convergence sweep over M,N
-
-cpus = [1 2 4 8];
-iiii = 1;
-force_filename = 'spline_6_F_FSA_norm_by_p_rho_avg.txt';
-global SPLINE_ORDER_SPAPI
-global SPLINE_TENSION
-global FACTOR_S
-global SMOOTH_FACTOR
-global POLYFIT_DEGREE
-POLYFIT_DEGREE=10
-
-FACTOR_S = 0.3
+%% deriv_method determines which method to use for the radial derivatives of R,Z and Lambda%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% These work fine and should be used %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+deriv_method='finite difference'; % central differences
+% deriv_method='finite difference 4th'; % 4th order central differences
+% deriv_method = 'spline' % MATLAB cubic splines
+% deriv_method = 'spapi' % MATLAB spline of arbitrary order
+global SPLINE_ORDER_SPAPI % order of spline for spapi (degree = order -1)
 SPLINE_ORDER_SPAPI=6
-SPLINE_TENSION = 1
-SMOOTH_FACTOR=0.99999999 % set to -1 to allow matlab to select
-% SMOOTH_FACTOR=-1
-for curr_s=[2048]
-    cpu = 1;
-    if curr_s==2048
-        cpu=8;
-    end
-    file_pre = sprintf('VMECfiles/wout_W7X_s%d_M16_N16_f12_cpu%d' ,curr_s,cpu)  ;
-    file = sprintf('%s.nc',file_pre);
-%     file = 'VMECfiles/wout_DSHAPE_s1024_M14_N0.nc';
-%     file = 'VMECfiles/wout_DSHAPE_s256_M14_N1_LBSUBS_T.nc'
-%     file = 'VMECfiles/wout_HELIOTRON_s1024_M12_N2.nc'
-%     file = 'VMECfiles/wout_HELIOTRON_s1024_M6_N3.nc'
-%     file = 'VMECfiles/wout_W7X_s1024_M16_N16_f12_cpu8_const_iota.nc' %
-%     const noble irrational
-%     file = 'VMECfiles/wout_W7X_s1024_M16_N16_f12_cpu8_zero_iota.nc' %
+% deriv_method = 'smooth_spline'
+global SMOOTH_FACTOR % controls how smooth spline is, let it be a negative number to let MATLAB decide how smooth the spline should be (should let MATLAB decide)
+SMOOTH_FACTOR=0.99999999; % set to -1 to allow matlab to select
 
-%     file = 'wout_DSHAPE_s1024_M14_N1_iota_1.nc'
-% file = 'VMECfiles/wout_DSHAPE_s256_M14_N0_zero_iota_initial.nc'
-% file = 'VMECfiles/wout_W7X_vac_s1024_M16_N16_f12_cpu8.nc'
-      try
-        data = read_vmec(file);
-        force_error
-	[val,s_ind] = min(abs(data.phi-0.1));
-        plot_force_error
-        
-        p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ data.Volume;
-       % F_avgg = F_V_avg / p_V_avg
-        E = VMEC_W_B + W_p;
-        F_rhos = trapz(u,trapz(v,F.*abs_g_vmec,3),2);
-        p_rhos = trapz(u,trapz(v,abs(presr).*sqrt(gSS).*abs_g_vmec,3),2);
-        F_fsa = F_rhos ./ p_rhos; % flux surface avg
-%         force_filename = 'DSHAPE_F_FSA.txt';
-%         dlmwrite(sprintf('VMECfiles/s%d_%s',curr_s,force_filename),F_fsa);
-     catch e
-         warning('Error, likely no wout for %s',file);
-         fprintf(1,'The identifier was:\n%s',e.identifier);
-         fprintf(1,'\nThere was an error! The message was:\n%s',e.message);
-     end
-end
-% plot_rationals
-plot_label='window 8 and k=5'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% these do not work well/have implementation issues and should not be used %%%
+% deriv_method='poly'
+
+% deriv_method='tension_spline'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% if one of these use_XX variables is true, will use that for the radial derivatives
+% and will ignore deriv_method
+%% Least Squares Fit Piecewise Polynomial
+use_piecewise_lsq = false; % least squares fit a piecewise polynomial to the data (will smooth out discontinuities/roughness)
+global POLY_LSQ_WINDOW_SIZE
+POLY_LSQ_WINDOW_SIZE=16; % number of data points to consider at a time in the polynomial fit
+global POLY_LSQ_ORDER
+POLY_LSQ_ORDER = 5; % polynomial order to fit the data window with
+%% One-sided Cubic Spline Basis
+use_my_cubic_spline=false; % use a one-sided spline basis to fit the data
+global MY_SPLINE_END_CONDITION
+MY_SPLINE_END_CONDITION = 'natural'; %% either 'natural' (2nd deriv=0 at endpoints) or 'not-a-knot' (3rd deriv = 0 at endpoints)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% select VMEC output filename to calculate force error of
+
+file = 'VMECfiles/wout_W7X_s512_M16_N16_f12_cpu1.nc'
+
+%% read VMEC file 
+data = read_vmec(file);
+%% run force_error script to calculate force error
+force_error
+
+%plot_force_error %uncomment if want to plot Force cross-sectional plot
+
+%% calculate energy and Flux Surface Avg of Force
+E = W_B + W_p;
+F_rhos = trapz(u,trapz(v,F.*abs_g_vmec,3),2);
+p_rhos = trapz(u,trapz(v,abs(presr).*sqrt(gSS).*abs_g_vmec,3),2);
+F_fsa = F_rhos ./ p_rhos; % flux surface avg
+
+
+plot_label=sprintf('%s',deriv_method);
 figure
-plot(s,F_fsa,'DisplayName',plot_label)
-hold on
+plot(s(1:data.ns),F_fsa(1:data.ns),'DisplayName',plot_label)
 set(gca, 'YScale', 'log')
-% legend
+legend
 ylabel('Normalized Force Error FSA')
 xlabel('s')
-if exist('F_FSA_fac','var')
-
-plot(s,F_FSA_fac,'--','DisplayName','window 8 and k=4')
-% 
-legend
-end
-% title('W7X F FSA for Two Iota Profiles')
-% for i=unique(rat_s)
-%     xline(i)
-%     hold on
-% end
-
-%% plot F error (not normalized)
-% figure
-% plot(s,F_FSA_fac,'DisplayName','Vacuum')
-% hold on
-% plot(s,F_rhos,'DisplayName','Pressure')
-% legend
-% ylabel('Force Error FSA (N/m)')
-% xlabel('s')
-% set(gca, 'YScale', 'log')
-% 
 
 
 figure
@@ -121,50 +66,3 @@ title('Iota Profile')
 plot(data.phi,data.iotaf)
 ylabel('Iota')
 xlabel('s')
-
-F_s_fsa = trapz(u,trapz(v,F_s.*abs_g_vmec,3),2);
-F_beta_fsa = trapz(u,trapz(v,F_beta.*abs_g_vmec,3),2);
-gSS_fsa = trapz(u,trapz(v,gSS.*abs_g_vmec,3),2);
-mag_beta_fsa = trapz(u,trapz(v,new_mag_beta.*abs_g_vmec,3),2);
-
-
-
-figure
-subplot(5,1,1)
-ax1 = gca;
-plot(s,F_rhos)
-title('Force Error in (N/m^3)')
-set(gca, 'YScale', 'log')
-subplot(5,1,2)
-ax2 = gca;
-plot(s,abs(F_s_fsa))
-title('F_s')
-set(gca, 'YScale', 'log')
-subplot(5,1,3)
-ax3 = gca;
-plot(s,abs(F_beta_fsa))
-title('F_beta')
-set(gca, 'YScale', 'log')
-subplot(5,1,4)
-ax4 = gca;
-plot(s,gSS_fsa)
-title('gSS')
-set(gca, 'YScale', 'log')
-subplot(5,1,5)
-ax5 = gca;
-plot(s,mag_beta_fsa)
-title('|beta|')
-set(gca, 'YScale', 'log')
-linkaxes([ax1 ax2 ax3 ax4 ax5],'x')
-
-
-
-
-
-figure
-JS_rhos = trapz(u,trapz(v,JS.*abs_g_vmec,3),2);
-plot(s,JS_rhos,'DisplayName','JS FSA')
-legend
-xlabel('s')
-ylabel('J^s')
-title('J^s FSA')

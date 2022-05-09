@@ -1,7 +1,6 @@
 function deriv = real_space_deriv(value,var_wrt_to,deriv_method)
 %REAL_SPACE_DERIV Take a value in real space (defined on s,u,v grid) and
 %return the derivative
-%   Only works for axisymmtric case right now
 size_val = size(value);
 space_dim = size(size_val);
 deriv = zeros(size(value));

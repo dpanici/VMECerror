@@ -5,3 +5,7 @@ test.m
 defunct/*
 *.nc
 sl*.out
+output_data/*
+output_data
+VMECfiles/*
+W7X_calc_data/*
