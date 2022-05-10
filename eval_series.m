@@ -28,23 +28,13 @@ sinmu = sin(mu);
 cosnv = cos(nv);
 sinnv = sin(nv);
 
-% if is_cos
-% evaluated_value = cfunct(u,v,coeffs,data.xm,data.xn)
-% end
 
 for is=1:dimS
     coeffs_rep = repmat(coeffs(:,is),[1 dimU]); % replicate the fourier coeffs at this flux surface across the values of u
     sin_term = (coeffs_rep.*sinmu)'*cosnv + (coeffs_rep.*cosmu)'*sinnv;
     cos_term = (coeffs_rep.*cosmu)'*cosnv - (coeffs_rep.*sinmu)'*sinnv;
     evaluated_value(is,:,:)= is_sin.*sin_term + is_cos.*cos_term;
-%     for i=1:length(data.xm)
-% %         sin_term = sin(data.xm(i).*u - data.nfp*data.xn(i).*v);
-% %         cos_term = cos(data.xm(i).*u - data.nfp*data.xn(i).*v);
-%         sin_term = sin(data.xm(i).*u + xn(i).*v);
-%         cos_term = cos(data.xm(i).*u + xn(i).*v);
-%         evaluated_value(is,:,:)= evaluated_value(is,:,:) ...
-%             + reshape(coeffs(i,is) .* (is_sin.*sin_term + is_cos.*cos_term),[1,dimU,dimV]);
-%     end
+
 end
 
 end

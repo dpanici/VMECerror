@@ -87,6 +87,7 @@ L_uu = eval_series(suvgrid, luumns, data, 's');
 L_vv = eval_series(suvgrid, lvvmns, data, 's');
 L_uv = eval_series(suvgrid, luvmns, data, 's');
 %% radial derivatives
+if ~use_real_space_radial_derivs
 R_s = eval_series(suvgrid, rsmnc, data, 'c');
 Z_s = eval_series(suvgrid, zsmns, data, 's');
 R_sv = eval_series(suvgrid, rsvmns, data, 's');
@@ -99,7 +100,22 @@ L_sv = eval_series(suvgrid, lsvmnc, data, 'c');
 
 R_ss = eval_series(suvgrid, rssmnc, data, 'c');
 Z_ss = eval_series(suvgrid, zssmns, data, 's');
+else
+[R_s,R_ss] = real_space_deriv_2(R, s,'c');
+[Z_s,Z_ss] = real_space_deriv_2(Z, s, 's');
+R_sv = real_space_deriv(R_v, s, 's');
+R_su = real_space_deriv(R_u, s, 's');
+Z_sv = real_space_deriv(Z_v, s,  'c');
+Z_su = real_space_deriv(Z_u, s,  'c');
 
+L_su = real_space_deriv(L_u, s,  'c');
+L_sv = real_space_deriv(L_v, s,  'c');
+if ~use_2nd_deriv
+R_ss = real_space_deriv(R_s, s,  'c');
+Z_ss = real_space_deriv(Z_s, s,  's');
+end
+    
+end
 % below derivs only used at magnetic axis
 % TODO only evaluate these at ONE POINT, dont need entire grid for the
 % axis lims
@@ -357,7 +373,7 @@ mag_beta = g .* sqrt((BV.^2).*guu + (BU.^2).*gvv - 2.*BV.*BU.*guv);
 new_mag_beta = sqrt((BV.^2).*dot(cross(ev,es,4),cross(ev,es,4),4) + (BU.^2).*dot(cross(es,eu,4),cross(es,eu,4),4) - 2.*BV.*BU.*dot(cross(ev,es,4),cross(es,eu,4),4));% just checking that if beta written with g cancelled with the denominators of gss,guu, is the same as the above line (it is)
 beta_is_same = min(ismembertol(abs(mag_beta(2:end,:,:)),new_mag_beta(2:end,:,:),1e-2),[],'all'); % can write beta without the magnitude of the Jacobian, tho it is
 %zero at the magnetic axis. 
-%mag_beta(1,:,:) = BV(1,:,:);
+
 %% Magnitude of Force error (N/m3)
 F_s = g .* (JV.*BU - JU.* BV) + presr;
 F_s(1,:,:) = (JV(1,:,:).*BU(1,:,:) - JU(1,:,:).*BV(1,:,:)) + presr(1,:,:);% define at axis by cancelling the g's

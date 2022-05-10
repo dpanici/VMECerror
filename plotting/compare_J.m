@@ -3,11 +3,18 @@ JU_vmec = eval_series_nyq(suvgrid,data.currumnc,data,'c');
 end
 if exist('JV_vmec','var') == false
 JV_vmec = eval_series_nyq(suvgrid,data.currvmnc,data,'c');
+Jphi_VMEC = JV_vmec .* R;
 end
 if exist('g_vmec','var') == false
 g_vmec = eval_series_nyq(suvgrid,data.gmnc,data,'c');
 end
-plot_rational_iotas=false;
+plot_rational_iotas=true;
+
+
+Jphi = JV .* R;
+
+% dlmwrite('VMEC_HELIOTRON_s1024_M12_N3_J_phi_at_u0_v0_v_s.txt',Jphi_VMEC(:,1,1)./g_vmec(:,1,1));
+
 
 % plot J * g
 figure()

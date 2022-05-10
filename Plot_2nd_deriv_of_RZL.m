@@ -5,6 +5,12 @@ close all
 clearvars
 %% read in the vmec file using matlabVMEC
 vmecfile = 'VMECfiles/wout_W7X_s2048_M16_N16_f12_cpu8.nc';
+% vmecfile = 'VMECfiles/wout_HELIOTRON_s1024_M6_N3.nc';
+% vmecfile = 'VMECfiles/wout_ESTELL.nc';
+% vmecfile='VMECfiles/wout_W7X_s512_M16_N16_f12_cpu8_no_s32.nc'
+% vmecfile='VMECfiles/wout_W7X_s2187_M16_N16_f12.nc'
+% vmecfile='VMECfiles/wout_W7X_s625_M16_N16_f12.nc'
+
 data = read_vmec(vmecfile);
 
 data.phi = data.phi/data.phi(end);% normalize data.phi by phi_b to get s
@@ -20,12 +26,17 @@ s = linspace(0,1,N);
 % profiles
 force_peak_s_locations=[0.7498,0.781,0.8123,0.8436,0.8749,0.9062,0.9374];
 
+spacing = force_peak_s_locations(2)-force_peak_s_locations(1);
+data.ns*spacing
+
+
 start_mode_ind = 1;
 %% range of s to plot on
-start_s_val = 0.7;
+start_s_val = 0.3;
 end_s_val = 0.98;
 [val,sind_1] = min(abs(data.phi-start_s_val));
 [val,sind_2] = min(abs(data.phi-end_s_val));
+
 
 
 %% rmnc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,6 +47,7 @@ end_s_val = 0.98;
 % 'finite difference', 'finite difference 4th', 'spline'
 y_2deriv_spline = s2_deriv(data.rmnc,data,'spline');
 y_2deriv_findif = s2_deriv(data.rmnc,data,'finite difference'); 
+% y_2deriv_findif=y_2deriv_spline;
 y_deriv_findif = s_deriv(data.rmnc,data,'finite difference');
 
 %% plot the value and radial derivatives of the coefficient with the largest 2nd derivative
@@ -43,9 +55,11 @@ y_deriv_findif = s_deriv(data.rmnc,data,'finite difference');
 
 figure
 plot(data.phi(sind_1:sind_2),data.rmnc(mode_ind_large_deriv,sind_1:sind_2),'.-','HandleVisibility','off')
+hold on
 ylabel('Value')
 xlabel('s')
 title(sprintf('Value of R_{mnc} vs s near edge for m=%d n=%d',data.xm(mode_ind_large_deriv),data.xn(mode_ind_large_deriv)/data.nfp))
+
 for loc=force_peak_s_locations
     [val,sind_peak] = min(abs(data.phi-loc));
     if loc == force_peak_s_locations(1)
@@ -59,6 +73,7 @@ end
 legend
 figure
 plot(data.phi(sind_1:sind_2),y_deriv_findif(mode_ind_large_deriv,sind_1:sind_2),'.-','HandleVisibility','off')
+hold on
 ylabel('Value')
 xlabel('s')
 title(sprintf('Value of dR_{mnc}/ds vs s near edge for m=%d n=%d',data.xm(mode_ind_large_deriv),data.xn(mode_ind_large_deriv)/data.nfp))
@@ -79,16 +94,18 @@ hold on
 ylabel('Value')
 xlabel('s')
 title(sprintf('Value of d^2R_{mnc}/ds^2 vs s near edge for m=%d n=%d',data.xm(mode_ind_large_deriv),data.xn(mode_ind_large_deriv)/data.nfp))
-for loc=force_peak_s_locations
-    [val,sind_peak] = min(abs(data.phi-loc));
-    if loc == force_peak_s_locations(1)
-    xline(data.phi(sind_peak),'--','DisplayName','Location of Spike')
-    hold on
-    else
-    xline(data.phi(sind_peak),'--','HandleVisibility','off')
-    hold on
-    end
-end
+% for loc=force_peak_s_locations
+%     [val,sind_peak] = min(abs(data.phi-loc));
+%     if loc == force_peak_s_locations(1)
+%     xline(data.phi(sind_peak),'--','DisplayName','Location of Spike')
+%     hold on
+%     else
+%     xline(data.phi(sind_peak),'--','HandleVisibility','off')
+%     hold on
+%     end
+% end
+
+
 legend
 %% plot the second derivative of all the rmnc modes
 

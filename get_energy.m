@@ -78,8 +78,8 @@ VMEC_W_B = VMEC_W_B * data.nfp
 % end
 % VMEC_W_B_RHS = VMEC_WB_RHS/2/mu0
 if dimV > 1
-    W_p = trapz(v,trapz(u,trapz(s,g.*presf./(gamma-1))));
+    W_p = data.nfp*trapz(v,trapz(u,trapz(s,abs(g).*presf./(gamma-1))));
 else
-    W_p = trapz(u,trapz(s,g.*presf./(gamma-1)));
+    W_p = trapz(u,trapz(s,abs(g).*presf./(gamma-1)));
 end
 W = W_B + W_p;
