@@ -1,5 +1,8 @@
-VMEC Error Analysis
+Set of functions and script used to calculate VMEC fixed-boundary equilibrium force error for Panici 2022
 
+Add this folder (`VMECerror`) and the subfolders `VMECerror/plotting` and `VMECerror/fxns` to your MATLAB path in order to run the scripts here and in the Zenodo files for the Panici 2022 paper.
+
+-------------------------------------------------------------------------
 force_error.m is the main script which will read in the data from the VMEC
 output files (wout) and get the R,Z,lambda fourier series coefficients,
 and calculate the necessary B,J and derivatives for findinf the force
