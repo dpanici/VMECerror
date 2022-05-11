@@ -13,5 +13,6 @@ error.
 
 debug_plot_quants.m plots a bunch of quantities and compares them to what 
 matlabVMEC calculates
-	Can use VMECplot command to plot quantities that readVMEC does not
-	give, but matlabVMEC has internally (such as g)
+
+example.m shows using the scripts to calculate force error FSA for an example
+VMEC equilibrium
