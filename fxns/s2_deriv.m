@@ -5,7 +5,6 @@ function value_s2_deriv=s2_deriv(fourier_coeffs,data,deriv_method)
 % Uses central difference for central points, and forward/backward diff for
 % endpoints
 global SPLINE_ORDER_SPAPI
-global FACTOR_S
 global SMOOTH_FACTOR
 global POLYFIT_DEGREE
 value_s2_deriv = zeros(size(data.rmnc));
@@ -15,10 +14,7 @@ arr_size = size(fourier_coeffs);
 refl_coeffs = zeros([arr_size(1) 2*data.ns-1]);
 refl_coeffs(:,data.ns:end) = fourier_coeffs;
 value_s2_deriv_r = zeros(size(refl_coeffs));
-value_s2_deriv_refl_fac = zeros(size(refl_coeffs));
 
-value_s_deriv_refl_fac = zeros(size(refl_coeffs));
-value_s_deriv_refl = zeros(size(refl_coeffs));
 for i=1:length(data.xm)
     if mod(data.xm(i),2) == 0
         refl_coeffs(i,1:data.ns-1) = flip(fourier_coeffs(i,2:end));
@@ -46,112 +42,7 @@ elseif strcmp(deriv_method,'finite difference 4th') % 4th order acc finite diffe
     value_s2_deriv_r(:,i) = (fourier_coeffs(:,end) - 2*fourier_coeffs(:,end-1) + fourier_coeffs(:,end-2))  / (data.phi(end) - data.phi(end-1))^2;
     value_s2_deriv = value_s2_deriv_r(:,data.ns:end);
     
-elseif strcmp(deriv_method,'factor difference')
-    % factor rho^m then do finite diff
-    % but only factor out to do the first few derivatives, not the entire
-    % thing?
-    % not reflecting
-    %% get first factored deriv
-    [val,s_ind] = min(abs(refl_phi-FACTOR_S))
-    % only do this for until s=0.1? then use non factored ones?
-    for i=1:length(data.xm)
-        refl_coeffs(i,1:data.ns-1) = refl_coeffs(i,1:data.ns-1) ./ sqrt(abs(refl_phi(1:data.ns-1))).^data.xm(i);
-        refl_coeffs(i,data.ns+1:s_ind+2) = refl_coeffs(i,data.ns+1:s_ind+2) ./ sqrt(abs(refl_phi(data.ns+1:s_ind+2))).^data.xm(i);
-    end
-    % centered diff everywhere the first index after rho=0 (do not want to
-    % use rho=0 value in any of these diffs)
-    % point
-    for i=data.ns+2:s_ind
-        value_s_deriv_refl_fac(:,i) = (refl_coeffs(:,i+1) - refl_coeffs(:,i-1)) ./ (refl_phi(i+1) - refl_phi(i-1));
-    end
-    i=data.ns; % do rho=0 point centered diff
-    value_s_deriv_refl_fac(:,data.ns) = (refl_coeffs(:,i+1) - refl_coeffs(:,i-1)) ./ (refl_phi(i+1) - refl_phi(i-1));
-% do point right after rho=0 using forward diff so dont use rho=0 value
-    i = data.ns+1;
-    value_s_deriv_refl_fac(:,data.ns+1) = (refl_coeffs(:,i+1) - refl_coeffs(:,i)) ./ (refl_phi(i+1) - refl_phi(i));
-% do endpoint at rho=rho(s_ind)
-%     value_s_deriv_refl_fac(:,s_ind) = (refl_coeffs(:,s_ind) - refl_coeffs(:,s_ind-1)) ./ (refl_phi(s_ind) - refl_phi(s_ind-1));
-%% do factored second deriv
-    % centered diff everywhere the first index after rho=0 (do not want to
-    % use rho=0 value in any of these diffs)
-    % point
-    %% centered diff O(h^2) acc
-%     for i=data.ns+2:s_ind
-%         value_s2_deriv_refl_fac(:,i) = (refl_coeffs(:,i+1) + refl_coeffs(:,i-1) - 2 * refl_coeffs(:,i)) / (refl_phi(i+1) - refl_phi(i))^2;
-%     end
-%     i=data.ns; % do rho=0 point centered diff
-%     value_s2_deriv_refl_fac(:,data.ns) = (refl_coeffs(:,i+1) + refl_coeffs(:,i-1) - 2 * refl_coeffs(:,i)) / (refl_phi(i+1) - refl_phi(i))^2;
-%     i = data.ns+1;
-%     value_s2_deriv_refl_fac(:,data.ns+1) = (refl_coeffs(:,i+1) + refl_coeffs(:,i-1) - 2 * refl_coeffs(:,i)) / (refl_phi(i+1) - refl_phi(i))^2;
-%% centered diff O(h^4) acc
-    for i=data.ns+2:s_ind
-        value_s2_deriv_refl_fac(:,i) = (-refl_coeffs(:,i+2) + 16.*refl_coeffs(:,i+1) - 30 .*refl_coeffs(:,i) + 16 .*refl_coeffs(:,i-1) -refl_coeffs(:,i-2)) / 12 /(refl_phi(i+1) - refl_phi(i))^2;
-    end
 
-
-%% get non factored first deriv
-    % multiply back rho^m
-    for i=1:length(data.xm)
-        refl_coeffs(i,1:data.ns-1) = refl_coeffs(i,1:data.ns-1) .* sqrt(abs(refl_phi(1:data.ns-1))).^data.xm(i);
-        refl_coeffs(i,data.ns+1:s_ind+2) = refl_coeffs(i,data.ns+1:s_ind+2) .* sqrt(abs(refl_phi(data.ns+1:s_ind+2))).^data.xm(i);
-    end
-    for i=1:length(data.xm)
-        value_s_deriv_refl_fac(i,1:data.ns-1) = value_s_deriv_refl_fac(i,1:data.ns-1) .* sqrt(abs(refl_phi(1:data.ns-1))).^data.xm(i) + refl_coeffs(i,1:data.ns-1).*data.xm(i)./abs(refl_phi(1:data.ns-1))./2;
-        value_s_deriv_refl_fac(i,data.ns+1:s_ind) = value_s_deriv_refl_fac(i,data.ns+1:s_ind) .* sqrt(abs(refl_phi(data.ns+1:s_ind))).^data.xm(i) + refl_coeffs(i,data.ns+1:s_ind).*data.xm(i)./abs(refl_phi(data.ns+1:s_ind))./2;
-    end    
-%% finally, get non factored second deriv for s=0 -> s=0.1
-
-%     for i=1:length(data.xm)
-%         m = data.xm(i);
-%         term1 = data.xm(i)/2 .* abs(refl_phi(1:data.ns-1)).^(m/2-1) .* value_s_deriv_refl_fac(i,1:data.ns-1);
-%         term2 = abs(refl_phi(1:data.ns-1)).^(m/2).*value_s2_deriv_refl_fac(i,1:data.ns-1);
-%         term3 = m ./2 .*abs(refl_phi(1:data.ns-1)).^(-1) .* value_s_deriv_refl(i,1:data.ns-1);
-%         term4 =  - m./2 .*abs(refl_phi(1:data.ns-1)).^(-2) .*  refl_coeffs(i,1:data.ns-1);
-%         value_s2_deriv_r(i,1:data.ns-1) = term1    +     term2     +    term3  + term4;  
-%         term1 = data.xm(i)./2 .* abs(refl_phi(data.ns+1:end)).^(m/2-1) .* value_s_deriv_refl_fac(i,data.ns+1:end);
-%         term2 = abs(refl_phi(data.ns+1:end)).^(m/2).*value_s2_deriv_refl_fac(i,data.ns+1:end);
-%         term3 = m ./2 .*abs(refl_phi(data.ns+1:end)).^(-1) .* value_s_deriv_refl(i,data.ns+1:end);
-%         term4 = - m ./2 .*abs(refl_phi(data.ns+1:end)).^(-2) .*  refl_coeffs(i,data.ns+1:end);
-%         value_s2_deriv_r(i,data.ns+1:end) =  term1  +     term2     +     term3     + term4;  
-%     end    
-% try other way
-    for i=1:length(data.xm)
-        m = data.xm(i);
-        term1 = (m/2).*(m/2-1) .* abs(refl_phi(1:data.ns-1)).^(-2) .* refl_coeffs(i,1:data.ns-1);
-        term2 = (m/2).*abs(refl_phi(1:data.ns-1)).^(m/2-1).*value_s_deriv_refl_fac(i,1:data.ns-1);
-        term3 = m ./2 .*abs(refl_phi(1:data.ns-1)).^(m/2-1) .* value_s_deriv_refl(i,1:data.ns-1);
-        term4 =  m./2 .*abs(refl_phi(1:data.ns-1)).^(m/2) .*  value_s2_deriv_refl_fac(i,1:data.ns-1);
-        value_s2_deriv_r(i,1:data.ns-1) = term1    +     term2     +    term3  + term4;  
-        term1 = (m/2).*(m/2-1) .* abs(refl_phi(data.ns+1:s_ind)).^(-2) .* refl_coeffs(i,data.ns+1:s_ind);
-        term2 = (m/2).*abs(refl_phi(data.ns+1:s_ind)).^(m/2-1).*value_s_deriv_refl_fac(i,data.ns+1:s_ind);
-        term3 = m ./2 .*abs(refl_phi(data.ns+1:s_ind)).^(m/2-1) .* value_s_deriv_refl(i,data.ns+1:s_ind);
-        term4 =  m./2 .*abs(refl_phi(data.ns+1:s_ind)).^(m/2) .*  value_s2_deriv_refl_fac(i,data.ns+1:s_ind);
-        value_s2_deriv_r(i,data.ns+1:s_ind) =  term1  +     term2     +     term3     + term4;  
-    end    
-    %% overleaf deriv
-    for i=1:length(data.xm)
-        m = data.xm(i);
-        ss = abs(refl_phi);
-        term1 = (m/2).*(m/2-1) .* ss(1:data.ns-1).^(-2) .* refl_coeffs(i,1:data.ns-1);
-        term2 = (m).*ss(1:data.ns-1).^(m/2-1) .*value_s_deriv_refl_fac(i,1:data.ns-1);
-%         term3 = m ./2 .*abs(refl_phi(1:data.ns-1)).^(m/2-1) .* value_s_deriv_refl(i,1:data.ns-1);
-        term4 =  abs(refl_phi(1:data.ns-1)).^(m/2) .*  value_s2_deriv_refl_fac(i,1:data.ns-1);
-        value_s2_deriv_r(i,1:data.ns-1) = term1    +     term2     + term4;  
-        term1 = (m/2).*(m/2-1) .* ss(data.ns+1:s_ind).^(-2) .* refl_coeffs(i,data.ns+1:s_ind);
-        term2 = (m).*ss(data.ns+1:s_ind).^(m/2-1) .*value_s_deriv_refl_fac(i,data.ns+1:s_ind);
-%         term3 = m ./2 .*abs(refl_phi(1:data.ns-1)).^(m/2-1) .* value_s_deriv_refl(i,1:data.ns-1);
-        term4 =  abs(refl_phi(data.ns+1:s_ind)).^(m/2) .*  value_s2_deriv_refl_fac(i,data.ns+1:s_ind);
-
-        value_s2_deriv_r(i,data.ns+1:s_ind) =  term1  +     term2     +     term3     + term4;  
-    end    
- %% get second deriv with centered for s=0.1 -> s=1
-    for i=s_ind+2:2*data.ns-2
-        value_s2_deriv_r(:,i) = (refl_coeffs(:,i+1) + refl_coeffs(:,i-1) - 2 * refl_coeffs(:,i)) / (refl_phi(i+1) - refl_phi(i))^2;
-    end
-    value_s2_deriv_r(:,end) = (fourier_coeffs(:,end) - 2*fourier_coeffs(:,end-1) + fourier_coeffs(:,end-2))  / (data.phi(end) - data.phi(end-1))^2;
- 
-    value_s2_deriv = value_s2_deriv_r(:,data.ns:end);
-%%
 elseif strcmp(deriv_method,'spline')
     spline_fit = spline(refl_phi,refl_coeffs);
     spline_deriv_2 = fnder(spline_fit,2);
@@ -195,7 +86,7 @@ elseif strcmp(deriv_method,'tension_spline') %% here could either fit 4 points a
 %         value_s_deriv_refl = feval(deriv_2,refl_phi);
 %         value_s2_deriv(i,:) = value_s_deriv_refl(data.ns:end);
 %     end
-elseif strcmp(deriv_method,'poly') % global polyfit, but maybe a local piecewise would be better, going 2^n at a time
+elseif strcmp(deriv_method,'poly') % piecewise polyfit
     for i=1:length(data.xm)
     fit = polyfit(refl_phi,refl_coeffs(i,:),POLYFIT_DEGREE);
     deriv_1 = polyder(fit);

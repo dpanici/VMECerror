@@ -1,7 +1,7 @@
 % test eval_series
 close all, clear all
-data = read_vmec('wout_HELIOTRON_16x4x4.nc');
-
+file='../example_files/wout_W7X_s256_M12_N12_f12_cpu1_32GB.nc';
+data=read_vmec(file);
 dimS = data.ns;
 dimU = 100;
 dimV = 100;
@@ -12,8 +12,8 @@ v = linspace(0,2*pi,dimV);
 
 suvgrid = ndgrid(s,u,v);
 tic
-R = eval_series2(suvgrid,data.rmnc,data,'c');
-Z = eval_series2(suvgrid,data.zmns,data,'s');
+R = eval_series(suvgrid,data.rmnc,data,'c');
+Z = eval_series(suvgrid,data.zmns,data,'s');
 toc
 
 figure()
@@ -24,5 +24,4 @@ end
 title('phi = 0')
 xlabel('R')
 ylabel('Z')
-ylim([-1.25,1.25])
-xlim([8.25,11.5])
+

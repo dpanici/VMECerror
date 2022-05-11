@@ -54,70 +54,13 @@ elseif strcmp(deriv_method,'finite difference 4th') % 4th order accurate central
     value_s_deriv = value_s_deriv_refl(:,data.ns:end);
 
 %%
-elseif strcmp(deriv_method,'factor difference')
-    % factor rho^m then do finite diff
-    % but only factor out to do the first few derivatives, not the entire
-    % thing?
-    % not reflecting
 
-    [val,s_ind] = min(abs(refl_phi-FACTOR_S));
-
-    % only do this for until s=0.1? then use non factored ones?
-    for i=1:length(data.xm)
-        refl_coeffs(i,1:data.ns-1) = refl_coeffs(i,1:data.ns-1) ./ sqrt(abs(refl_phi(1:data.ns-1))).^data.xm(i);
-        refl_coeffs(i,data.ns+1:s_ind) = refl_coeffs(i,data.ns+1:s_ind) ./ sqrt(abs(refl_phi(data.ns+1:s_ind))).^data.xm(i);
-    end
-    % centered diff everywhere the first index after rho=0 (do not want to
-    % use rho=0 value in any of these diffs)
-    % point
-    for i=data.ns+2:s_ind
-        value_s_deriv_refl(:,i) = (refl_coeffs(:,i+1) - refl_coeffs(:,i-1)) ./ (refl_phi(i+1) - refl_phi(i-1));
-    end
-    i=data.ns; % do rho=0 point centered diff
-    value_s_deriv_refl(:,data.ns) = (refl_coeffs(:,i+1) - refl_coeffs(:,i-1)) ./ (refl_phi(i+1) - refl_phi(i-1));
-% do point right after rho=0 using forward diff so dont use rho=0 value
-    i = data.ns+1;
-    value_s_deriv_refl(:,data.ns+1) = (refl_coeffs(:,i+1) - refl_coeffs(:,i)) ./ (refl_phi(i+1) - refl_phi(i));
-% do endpoint at rho=rho(s_ind)
-    value_s_deriv_refl(:,s_ind) = (refl_coeffs(:,s_ind) - refl_coeffs(:,s_ind-1)) ./ (refl_phi(s_ind) - refl_phi(s_ind-1));
-    % multiply back rho^m
-    for i=1:length(data.xm)
-        refl_coeffs(i,1:data.ns-1) = refl_coeffs(i,1:data.ns-1) .* sqrt(abs(refl_phi(1:data.ns-1))).^data.xm(i);
-        refl_coeffs(i,data.ns+1:s_ind) = refl_coeffs(i,data.ns+1:s_ind) .* sqrt(abs(refl_phi(data.ns+1:s_ind))).^data.xm(i);
-    end
-    for i=1:length(data.xm)
-        value_s_deriv_refl(i,1:data.ns-1) = value_s_deriv_refl(i,1:data.ns-1) .* sqrt(abs(refl_phi(1:data.ns-1))).^data.xm(i) + refl_coeffs(i,1:data.ns-1).*data.xm(i)./abs(refl_phi(1:data.ns-1))./2;
-        value_s_deriv_refl(i,data.ns+1:s_ind) = value_s_deriv_refl(i,data.ns+1:s_ind) .* sqrt(abs(refl_phi(data.ns+1:s_ind))).^data.xm(i) + refl_coeffs(i,data.ns+1:s_ind).*data.xm(i)./abs(refl_phi(data.ns+1:s_ind))./2;
-    end    
-
-    % now we have values for s=0 -> s=0.1, lets get the rest of the values
-    % like normal from finite diff
-    for i=s_ind+1:2*data.ns-2
-        value_s_deriv_refl(:,i) = (refl_coeffs(:,i+1) - refl_coeffs(:,i-1)) / (refl_phi(i+1) - refl_phi(i-1));
-    end
-    
-    value_s_deriv_refl(:,end) = (refl_coeffs(:,end) - refl_coeffs(:,end-1)) / (refl_phi(end) - refl_phi(end-1));
-    value_s_deriv = value_s_deriv_refl(:,data.ns:end);
-%%
 elseif strcmp(deriv_method,'spline')
     fit = spline(refl_phi,refl_coeffs);
     spline_deriv_1 = fnder(fit,1);
     value_s_deriv_refl = ppval(spline_deriv_1,refl_phi);
     value_s_deriv = value_s_deriv_refl(:,data.ns:end);
 %%
-elseif strcmp(deriv_method,'factor_spline')
-    % factor out rho^m from data (except for rho=0) before spline fitting
-    for i=1:length(data.xm)
-    refl_coeffs(:,1:data.ns-1) = refl_coeffs(:,1:data.ns-1) / refl_phi(1:data.ns-1).^data.xm(i);
-    refl_coeffs(:,data.ns+1:end) = refl_coeffs(:,data.ns+1:end) / refl_phi(data.ns+1:end).^data.xm(i);
-    end
-    % above are the R tilde ones
-    fit = spline(refl_phi,refl_coeffs);
-
-    spline_deriv_1 = fnder(fit,1);
-    value_s_deriv_refl = ppval(spline_deriv_1,refl_phi);
-    value_s_deriv = value_s_deriv_refl(:,data.ns:end);
-%%    
 elseif strcmp(deriv_method,'smooth_spline')
 %     spline_fit = spline(refl_phi,refl_coeffs);
     [fit,p1] = csaps(refl_phi,refl_coeffs,SMOOTH_FACTOR); % smoothing spline, results in pretty bad looks near axis
@@ -159,15 +102,8 @@ elseif strcmp(deriv_method,'makima')
     deriv_1 = fnder(fit,1);
     value_s_deriv_refl = ppval(deriv_1,refl_phi);
     value_s_deriv = value_s_deriv_refl(:,data.ns:end);
-% elseif strcmp(deriv_method,'chebfun') %requires the chebfuntoolbox
-% installed in local directory, gives highly oscillatory results
-%     for i=1:length(data.xm)
-%         fit = chebfun(refl_coeffs(i,:)',[refl_phi(1) refl_phi(end)],'equi');
-%         deriv_1 = diff(fit);
-%         value_s_deriv_refl = feval(deriv_1,refl_phi);
-%         value_s_deriv(i,:) = value_s_deriv_refl(data.ns:end);
-%     end
-elseif strcmp(deriv_method,'poly') % global polyfit, but maybe a local piecewise would be better, going 2^n at a time
+
+elseif strcmp(deriv_method,'poly') %piecewise poly fit
     for i=1:length(data.xm)
     fit = polyfit(refl_phi,refl_coeffs(i,:),POLYFIT_DEGREE);
     deriv_1 = polyder(fit);
@@ -175,14 +111,5 @@ elseif strcmp(deriv_method,'poly') % global polyfit, but maybe a local piecewise
     value_s_deriv(i,:) = value_s_deriv_refl(data.ns:end);
     end
 end
-% for i=1:5
-% f=figure;
-% scatter(refl_phi,refl_coeffs(i,:))
-% hold on
-% plot(refl_phi,ppval(fit,refl_phi),'DisplayName',sprintf('%s Fit',deriv_method))
-% xlabel('Phi')
-% ylabel('Fourier Coefficient')
-% title(sprintf('Fourier coefficient m = %s n = %s Fit',data.xm(i),data.xn(i)))
-% uiwait(f)
-% end
+
 end

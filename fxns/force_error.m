@@ -1,17 +1,11 @@
 % Calculate Force error
 
-% method used to calculate radial derivatives
-% deriv_method='finite difference';
-% deriv_method='spline';
-% deriv_method = 'pchip';
-% deriv_method = 'makima';
 
-deriv_method_1d = 'finite difference'; %deriv method to calculate dp/dr, phi' and chi'
+deriv_method_1d = 'finite difference'; %deriv method to calculate dp/ds, phi' and chi'
 numerical_covariant_B_derivs = 0; % calculate cov_B derivs analytically (0) or numerically (1)
 numerical_contravariant_B_derivs = 0; % calculate contra_B derivs analytically (0) or numerically (1)
 use_VMEC_contr_B = 0; % use VMEC contr B components to take derivs of and get cov B derivs and then J
 use_VMEC_cov_B = 0;% use VMEC cov B components to take derivs of and get J (supersedes use VMEC contr B)
-interpolate = false; % whether or not to interpolate R,L,Z onto a finer grid before calculating force (not yet implemented)
 only_energy=false; % only calculate energy, don't calculate force error
 
 %% constants
@@ -29,7 +23,7 @@ end
 Phi = -data.phi./2./pi; % toroidal flux normalized by 2*pi (Hirshman p.3, 
 % chi, Phi are actually the normalized fluxes)
 
-data.phi = data.phi/ data.phi(end); 
+data.phi = data.phi/ data.phi(end); % normalize toroidal flux to get s
 s = data.phi ; % radial variable
 u = linspace(0,2*pi,dimU); % poloidal angle
 v = linspace(0,2*pi/data.nfp,dimV); % toroidal angle
@@ -38,7 +32,6 @@ suvgrid = ndgrid(s,u,v);
 
 
 %% Flux, iota,and pressure derivs
-% should just derive data.ai to get exact derivative of iota
 iota = data.iotaf;% rotational transform
 iotar = repmat((s_deriv_non_refl(iota,data,deriv_method_1d))',1,dimU,dimV); % radial deriv of rotational transform
 
@@ -117,8 +110,7 @@ end
     
 end
 % below derivs only used at magnetic axis
-% TODO only evaluate these at ONE POINT, dont need entire grid for the
-% axis lims
+
 % R_sss = eval_series(suvgrid, rsssmnc, data, 'c');
 % Z_sss = eval_series(suvgrid, zsssmns, data, 's');
 % 
@@ -336,7 +328,6 @@ if numerical_covariant_B_derivs
     run('plotting/plot_cov_B')
 end
 
-% dont worry about half mesh stuff right now
 if use_VMEC_cov_B
 Bv_smnc = s_deriv_nyq(data.bsubvmnc,data,deriv_method);
 Bv_s = eval_series_nyq(suvgrid,Bv_smnc,data,'c');
@@ -369,10 +360,8 @@ JV(1,:,:) = (Bu_s(1,:,:) - Bs_u(1,:,:)) ./ mu0;
 
 %% Magnitudes of direction vectors
 mag_eS = sqrt(gSS);
-mag_beta = g .* sqrt((BV.^2).*guu + (BU.^2).*gvv - 2.*BV.*BU.*guv);
 new_mag_beta = sqrt((BV.^2).*dot(cross(ev,es,4),cross(ev,es,4),4) + (BU.^2).*dot(cross(es,eu,4),cross(es,eu,4),4) - 2.*BV.*BU.*dot(cross(ev,es,4),cross(es,eu,4),4));% just checking that if beta written with g cancelled with the denominators of gss,guu, is the same as the above line (it is)
-beta_is_same = min(ismembertol(abs(mag_beta(2:end,:,:)),new_mag_beta(2:end,:,:),1e-2),[],'all'); % can write beta without the magnitude of the Jacobian, tho it is
-%zero at the magnetic axis. 
+
 
 %% Magnitude of Force error (N/m3)
 F_s = g .* (JV.*BU - JU.* BV) + presr;
@@ -382,11 +371,8 @@ F_beta = JS;
 
 F = sqrt((F_s.^2).*gSS + (F_beta.^2).*(new_mag_beta.^2));
 
+% calculate energy
 get_energy
-
-
-% get FSAs of each of above quantities
-
 
 
 

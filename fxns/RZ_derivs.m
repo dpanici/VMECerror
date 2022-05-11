@@ -1,41 +1,34 @@
-% Create the fourier coeffs for the derivatives of R,Z, and lambda
+% Create the fourier coeffs for the s,u,v derivatives of R,Z, and lambda
 
 % d = read_vmec('wout_HELIOTRON_16x4x4.nc');
 d = data;
 xn = d.xn;
 xm = d.xm;
 
-% matlabvmec uses (mu+nv) convention, so my fourer coeffs involving v derivs
-% will be of the opposite sign to those calculated by matlabVMEC
+% using (mu+nv) convention, since that is what is output by matlabVMEC's
+% readVMEC function
 
 % d.rmnc is fourier coefs for R
 % d.zmns is fourier coefs for Z
 % indexed first by fourier mode, second by radial coordinate s
 % so for example, R(:,end) returns all cos fourier coeffs of the outermost
 % flux surface defined by s=1
-% in vmec outputs rmnc, etc, s goes from 1/ns to the 1
+% in vmec outputs rmnc, etc, s goes from 1/ns to 1
 
 % need to first be able to get the derivs wrt u,v at the discrete s
 % surfaces we have
 
-% grid we will evaluate errors on will be a 3D array index by (s,u,nfp*v),
-% 0 <= s <= 1, 0 <= u <= 2pi, 0 <= v <= 2pi
-% if I have grid as nfp*v, I should be able to plot just one field period,
-% no need to do multiple field periods. Though I think I do need to keep
-% nfp in the derivatives? maybe not, unsure of this
-
-% may need to have a second one where s grid is defined by the discrete
-% surfaces given by VMEC and use that one to evaluate the derivatives to
-% interpolate onto the larger volumetric grid
+% grid we will evaluate errors on will be a 3D array index by (s,u,v),
+% 0 <= s <= 1, 0 <= u <= 2pi, 0 <= v <= 2pi/nfp
 
 % functional form is R = rmnc(s) * cos(m*u - n*v*nfp)
 % and               Z = zmns(s) * sin(m*u - n*v*nfp)
-% this is the fxn form for the fourier series R and Z for most stellarator
+% this is the fxn form for the fourier series R and Z for stellarator
 % symmetric shapes(i.e. R is always defined by cos and Z by sin because of
 % the symmetries they have), since Z is negative when u = -u and R stays
 % the same when u = -u, so R is cos and Z is sin
 
-%denote derivatives with a subscript
+% denote derivatives with a subscript
 % rumns is partial deriv of R wrt u sine coeffs, with same mode ordering in the rows as in xm,xn etc
 % matlabVMEC's xn is actually xn*nfp, so do not need to use nfp in doing these derivatives 
 
@@ -43,7 +36,7 @@ xm = d.xm;
 % R_u = -rmnc * m * sin(m*u + n*v*nfp)
 rumns = -d.rmnc .* xm'; % 2D array of the coeffs of the sine terms that are the deriv of R wrt u, first index gives fourier coeff, second gives s index
 
-assert(isequal(rumns, d.rumns)) % check against VMEC output  which also calculates rumns
+assert(isequal(rumns, d.rumns)) % check against matlabVMEC output  which also calculates rumns
 
 % R_v =  -rmnc * n*nfp*sin(m*u + n*v*nfp)
 rvmns = -d.rmnc .* xn';%.* d.nfp;
@@ -81,12 +74,6 @@ zuvmns = -d.zmns .* xm' .* xn';
 % Convert lambda from the half-mesh onto the full mesh
 %  just linear interpolation onto the full mesh from the half-mesh
 lmns = zeros(size(d.lmns));
-% lmns(:,1) = 1.5*d.lmns(:,1) - 0.5*d.lmns(:,2); % should be axis limit for lambda
-% lmns(:,2:d.ns) = 0.5 * (d.lmns(:,1:d.ns-1) + d.lmns(:,2:d.ns));
-% lmns(:,end) = 3/2 * d.lmns(:,end-1) - 0.5*d.lmns(:,end-2);
-% figure
-% plot(data.phi,lmns(3,:),'DisplayName','full mesh 1st way')
-% hold on
 
 if use_lambda_full_mesh
 for i=2:d.ns

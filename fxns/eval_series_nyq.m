@@ -8,6 +8,7 @@ function evaluated_value = eval_series_nyq(suvgrid, coeffs, data, s_or_c)
 % vectorized for speed
 % for values from matlabVMEC with nyquist fourier spectra (larger spectrum
 % than R,Z)
+% credit to matlabVMEC for implementation inspiration
 
 evaluated_value = zeros(size(suvgrid));
 dimS = size(suvgrid,1);
@@ -36,14 +37,7 @@ for is=1:dimS
     sin_term = (coeffs_rep.*sinmu)'*cosnv + (coeffs_rep.*cosmu)'*sinnv;
     cos_term = (coeffs_rep.*cosmu)'*cosnv - (coeffs_rep.*sinmu)'*sinnv;
     evaluated_value(is,:,:)= is_sin.*sin_term + is_cos.*cos_term;
-%     for i=1:length(data.xm_nyq)
-% %         sin_term = sin(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
-% %         cos_term = cos(data.xm_nyq(i).*u - data.nfp*data.xn_nyq(i).*v);
-%         sin_term = sin(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
-%         cos_term = cos(data.xm_nyq(i).*u + data.xn_nyq(i).*v);
-%         evaluated_value(is,:,:)= evaluated_value(is,:,:) ...
-%             + reshape(coeffs(i,is) .* (is_sin.*sin_term + is_cos.*cos_term),[1,dimU,dimV]);
-%     end
+
 end
 
 end

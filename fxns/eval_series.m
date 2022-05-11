@@ -6,6 +6,7 @@ function evaluated_value = eval_series(suvgrid, coeffs, data, s_or_c)
 % (i.e. there should be one set of fourier coeffs for each s value in the
 % suvgrid)
 % vectorized for speed
+% credit to matlabVMEC for implementation inspiration
 xn = data.xn;
 evaluated_value = zeros(size(suvgrid));
 dimS = size(suvgrid,1);
