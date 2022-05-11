@@ -1,61 +1,72 @@
 %% runs force_error script and plots force error
+% uses smoothing spline
 close all
 clearvars
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Set calculation parameters, such as which radial derivative method to use,can leave as the defaults
+use_lambda_full_mesh=true; % interpolate lambda from half mesh to full mesh
+%% deriv_method determines which method to use for the radial derivatives of R,Z and Lambda%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% These work fine and should be used %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%deriv_method='finite difference'; % central differences
+% deriv_method='finite difference 4th'; % 4th order central differences
+% deriv_method = 'spline' % MATLAB cubic splines
+%
+% deriv_method = 'spapi' % MATLAB spline of arbitrary order
+global SPLINE_ORDER_SPAPI % order of spline for spapi (degree = order -1)
+SPLINE_ORDER_SPAPI=3;
+%
+ deriv_method = 'smooth_spline'
+global SMOOTH_FACTOR % controls how smooth spline is, let it be a negative number to let MATLAB decide how smooth the spline should be (should let MATLAB decide)
+SMOOTH_FACTOR=0.99999999; % set to -1 to allow matlab to select
+%
+use_real_space_radial_derivs = false; % if true, use radial derivatives obtained from R,Z after transforming to real space, not radial derivs of the RMNC, ZMNS fourier coefficients
 
-u_index= 11; % index of u to plot quantities at
-v_nfp_index=1; % index of v to plot quantities at
-nfp_v_index = v_nfp_index;
-s_index=6; % index of s to plot quantities at
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% these do not work well/have implementation issues and should not be used %%%
+% deriv_method='poly'
 
-path_to_W7X = '/p/desc-usr/dpanici/vmec/W7X_pressure/';
-% load in VMEC data then run force error to calculate everything
-
-% plot force_error will do as its name implies
-% plot_force_error
-deriv_method='smooth_spline';
 % deriv_method='tension_spline'
-Ns = [1 2 3];
-Ms = [8 10 12 14 16];
-%Ms = [14 16]
-%ftols = [4 8 12];
-ftols = [4 8 12];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% if one of these use_XX variables is true, will use that for the radial derivatives
+% and will ignore deriv_method
+%% Least Squares Fit Piecewise Polynomial
+use_piecewise_lsq = false; % least squares fit a piecewise polynomial to the data (will smooth out discontinuities/roughness)
+global POLY_LSQ_WINDOW_SIZE
+POLY_LSQ_WINDOW_SIZE=16; % number of data points to consider at a time in the polynomial fit
+global POLY_LSQ_ORDER
+POLY_LSQ_ORDER = 5; % polynomial order to fit the data window with
+%% One-sided Cubic Spline Basis
+use_my_cubic_spline=false; % use a one-sided spline basis to fit the data
+global MY_SPLINE_END_CONDITION
+MY_SPLINE_END_CONDITION = 'natural'; %% either 'natural' (2nd deriv=0 at endpoints) or 'not-a-knot' (3rd deriv = 0 at endpoints)
 
-s_nums = [128 256 512 1024 2048]; %no s1024 needed for convergence sweep over M,N
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% select VMEC output filename to calculate force error of
 
-cpus = [1 2 4 8];
-iiii = 1;
-force_filename = 'F_spline_FSA_norm_by_p_V_avg.txt';
-global SPLINE_ORDER_SPAPI
-global SPLINE_TENSION
-SPLINE_TENSION = 1
-for curr_s=[512,1024]
-    cpu = 1;
-    if curr_s==2048
-        cpu=8;
-    end
-    file_pre = sprintf('VMECfiles/wout_W7X_s%d_M16_N16_f12_cpu%d' ,curr_s,cpu)  ;
-    file = sprintf('%s.nc',file_pre)
-    SPLINE_ORDER_SPAPI = 3;
-      try
-        data = read_vmec(file);
-        force_error
-	[val,s_ind] = min(abs(data.phi-0.1));
-        plot_force_error
-        
-        p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ data.Volume;
-       % F_avgg = F_V_avg / p_V_avg
-        E = VMEC_W_B + W_p;
-        F_rhos = trapz(u,trapz(v,F.*abs_g_vmec,3),2);
-        p_rhos = trapz(u,trapz(v,abs(presr).*sqrt(gSS).*abs_g_vmec,3),2);
-        F_fsa = F_rhos ./ p_V_avg; % flux surface avg
-%         dlmwrite(sprintf('VMECfiles/smooth_spline_FSA_s%d_%s',curr_s,force_filename),F_fsa);
-     catch e
-         warning('Error, likely no wout for %s',file);
-         fprintf(1,'The identifier was:\n%s',e.identifier);
-         fprintf(1,'\nThere was an error! The message was:\n%s',e.message);
-     end
-end
+
+
+file='../example_files/wout_W7X_s256_M12_N12_f12_cpu1_32GB.nc';
+
+SPLINE_ORDER_SPAPI = 3;
+  try
+    data = read_vmec(file);
+    force_error
+[val,s_ind] = min(abs(data.phi-0.1));
+    plot_force_error
+
+    p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ data.Volume;
+   % F_avgg = F_V_avg / p_V_avg
+    E = VMEC_W_B + W_p;
+    F_rhos = trapz(u,trapz(v,F.*abs_g_vmec,3),2);
+    p_rhos = trapz(u,trapz(v,abs(presr).*sqrt(gSS).*abs_g_vmec,3),2);
+    F_fsa = F_rhos ./ p_V_avg; % flux surface avg
+ catch e
+     warning('Error, likely no wout for %s',file);
+     fprintf(1,'The identifier was:\n%s',e.identifier);
+     fprintf(1,'\nThere was an error! The message was:\n%s',e.message);
+ end
+
 
 figure
-plot(sqrt(s),F_fsa)
+plot(s,F_fsa)
 set(gca, 'YScale', 'log')
