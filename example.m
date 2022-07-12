@@ -47,7 +47,6 @@ MY_SPLINE_END_CONDITION = 'natural'; %% either 'natural' (2nd deriv=0 at endpoin
 
 
 file='./example_files/wout_W7X_s256_M12_N12_f12_cpu1_32GB.nc';
-% file='wout_W7X_s256_M12_N12_f12_cpu1_32GB.nc';
 
 
 %% read VMEC file using matlabVMEC read_VMEC function
@@ -59,9 +58,21 @@ force_error
 E = W_B + W_p;
 F_rhos = trapz(u,trapz(v,F.*abs_g_vmec,3),2) ./ trapz(u,trapz(v,abs_g_vmec,3),2);
 vol = trapz(v,trapz(u,trapz(s,abs_g_vmec)));
-p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ vol;
-F_fsa = F_rhos ./ p_V_avg; % flux surface avg normalized by volume average of pressure gradient
 
+% choose normalization for FSA based on if pressure or vacuum
+p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ vol;
+if max(data.presf) > 1e-3 % normalize by pressure gradient
+    normalize = p_V_avg
+else % normalize by magnetic pressure gradient
+    grad_B_pres_s = (BU.*Bu_s + Bu.*BU_s + Bv.*BV_s + BV.*Bv_s)*0.5; % contravariant s component of the magnetic pressure gradient
+    grad_B_pres_u = (BU.*Bu_u + Bu.*BU_u + Bv.*BV_u + BV.*Bv_u).*0.5; % contravariant u component of the magnetic pressure gradient
+    grad_B_pres_v = (BU.*Bu_v + Bu.*BU_v + Bv.*BV_v + BV.*Bv_v).*0.5; % contravariant v component of the magnetic pressure gradient
+    grad_B_pres = (grad_B_pres_s .* eS + grad_B_pres_u .* eU + grad_B_pres_v .* eV);
+
+    mag_grad_B_pres = sqrt((grad_B_pres_s .* dot(grad_B_pres,eS,4) + grad_B_pres_u .* dot(grad_B_pres,eU,4) + grad_B_pres_v .* dot(grad_B_pres,eV,4) ) );
+    normalize = mag_grad_B_pres
+end
+F_fsa = F_rhos ./ p_V_avg; % flux surface avg normalized by volume average of pressure gradient
 
 
 % plot force error and flux surfaces
