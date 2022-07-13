@@ -62,17 +62,19 @@ vol = trapz(v,trapz(u,trapz(s,abs_g_vmec)));
 % choose normalization for FSA based on if pressure or vacuum
 p_V_avg = trapz(v,trapz(u,trapz(s,abs(presr).*sqrt(gSS).*abs_g_vmec))) ./ vol;
 if max(data.presf) > 1e-3 % normalize by pressure gradient
-    normalize = p_V_avg
+    normalize = p_V_avg;
 else % normalize by magnetic pressure gradient
     grad_B_pres_s = (BU.*Bu_s + Bu.*BU_s + Bv.*BV_s + BV.*Bv_s)*0.5; % contravariant s component of the magnetic pressure gradient
     grad_B_pres_u = (BU.*Bu_u + Bu.*BU_u + Bv.*BV_u + BV.*Bv_u).*0.5; % contravariant u component of the magnetic pressure gradient
     grad_B_pres_v = (BU.*Bu_v + Bu.*BU_v + Bv.*BV_v + BV.*Bv_v).*0.5; % contravariant v component of the magnetic pressure gradient
     grad_B_pres = (grad_B_pres_s .* eS + grad_B_pres_u .* eU + grad_B_pres_v .* eV);
 
-    mag_grad_B_pres = sqrt((grad_B_pres_s .* dot(grad_B_pres,eS,4) + grad_B_pres_u .* dot(grad_B_pres,eU,4) + grad_B_pres_v .* dot(grad_B_pres,eV,4) ) );
-    normalize = mag_grad_B_pres
+    mag_grad_B_pres = mu0.*sqrt((grad_B_pres_s .* dot(grad_B_pres,eS,4) + grad_B_pres_u .* dot(grad_B_pres,eU,4) + grad_B_pres_v .* dot(grad_B_pres,eV,4) ) );
+    
+    mag_grad_B_pres_V_avg = trapz(v,trapz(u,trapz(s(2:end),mag_grad_B_pres(2:end,:,:).*abs_g_vmec(2:end,:,:)))) ./ vol;
+    normalize = mag_grad_B_pres_V_avg;
 end
-F_fsa = F_rhos ./ p_V_avg; % flux surface avg normalized by volume average of pressure gradient
+F_fsa = F_rhos ./ normalize; % flux surface avg normalized by volume average of pressure gradient
 
 
 % plot force error and flux surfaces

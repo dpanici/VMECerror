@@ -8,7 +8,7 @@ end
 if exist('g_vmec','var') == false
 g_vmec = eval_series_nyq(suvgrid,data.gmnc,data,'c');
 end
-plot_rational_iotas=true;
+plot_rational_iotas=false;
 
 
 Jphi = JV .* R;

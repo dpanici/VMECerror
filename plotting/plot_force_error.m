@@ -67,18 +67,17 @@ else % vacuum case, use ratio of gradient of magnetic pressure to magnetic field
     grad_B_pres_v = (BU.*Bu_v + Bu.*BU_v + Bv.*BV_v + BV.*Bv_v).*0.5; % contravariant v component of the magnetic pressure gradient
     grad_B_pres = (grad_B_pres_s .* eS + grad_B_pres_u .* eU + grad_B_pres_v .* eV);
 
-    mag_grad_B_pres = sqrt((grad_B_pres_s .* dot(grad_B_pres,eS,4) + grad_B_pres_u .* dot(grad_B_pres,eU,4) + grad_B_pres_v .* dot(grad_B_pres,eV,4) ) );
+    mag_grad_B_pres = mu0.*sqrt((grad_B_pres_s .* dot(grad_B_pres,eS,4) + grad_B_pres_u .* dot(grad_B_pres,eU,4) + grad_B_pres_v .* dot(grad_B_pres,eV,4) ) );
 
 
     mag_vac_F = sqrt(mag_grad_B_pres.^2 + mag_B_tension.^2 - 2.*dot(grad_B_pres,B_tension,4))./mu0;
     
 
     figure()
-    contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),abs(mu0.*F(:,:,nfp_v_index))./nanmean(mag_grad_B_pres(:,1,nfp_v_index)),20)
+    contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),abs(F(:,:,nfp_v_index))./nanmean(mag_grad_B_pres(:,1,nfp_v_index)),20)
     % contourf(R(:,:,nfp_v_index),Z(:,:,nfp_v_index),log10(F(:,:,nfp_v_index)))
     hold on
     c=colorbar; 
-    caxis([0 1]);
     hold on
     xlabel('R (m)')
     ylabel('Z (m)')
