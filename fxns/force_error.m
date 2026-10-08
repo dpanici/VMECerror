@@ -369,7 +369,10 @@ F_s(1,:,:) = (JV(1,:,:).*BU(1,:,:) - JU(1,:,:).*BV(1,:,:)) + presr(1,:,:);% defi
 F_beta = JS;
 
 
-F = sqrt((F_s.^2).*gSS + (F_beta.^2).*(new_mag_beta.^2));
+force_gradient_s = eS;
+force_gradient_s(1,:,:,:) = temp1(1,:,:,:);
+force_vector = F_s.*force_gradient_s + F_beta.*(BV.*cross(ev,es,4) - BU.*cross(es,eu,4));
+F = sqrt(sum(force_vector.^2,4));
 
 % calculate energy
 get_energy
